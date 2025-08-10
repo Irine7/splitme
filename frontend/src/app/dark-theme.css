@@ -1,0 +1,75 @@
+/* Dark theme enhancements based on the masterclass design with Montserrat font */
+.dark {
+  /* Typography enhancements */
+  --font-weight-heading: 700;
+  --letter-spacing-heading: -0.02em;
+  
+  /* Background texture effect */
+  background-image: 
+    linear-gradient(to bottom, 
+      rgba(0, 0, 0, 0.2) 0%, 
+      rgba(0, 0, 0, 0.1) 20%, 
+      rgba(0, 0, 0, 0) 100%),
+    radial-gradient(
+      ellipse at top left,
+      rgba(50, 50, 50, 0.2) 0%,
+      rgba(0, 0, 0, 0) 60%
+    );
+  background-attachment: fixed;
+}
+
+/* Masterclass heading styles */
+.dark .masterclass-title {
+  font-size: 2.5rem;
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.5rem;
+}
+
+.dark .masterclass-subtitle {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.7));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+  margin-bottom: 2rem;
+}
+
+/* Date display styling */
+.dark .event-date {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.75rem 1.5rem;
+  background-color: rgba(30, 30, 30, 0.7);
+  border-radius: 9999px;
+  width: fit-content;
+  margin-top: 2rem;
+}
+
+.dark .event-date-icon {
+  opacity: 0.7;
+}
+
+/* Footer text */
+.dark .event-footer {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 3rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* 3D object styling (like the rocket) */
+.dark .object-3d {
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+}

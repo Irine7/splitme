@@ -14,7 +14,7 @@ module.exports = {
   },
   theme: {
     fontFamily: {
-      sans: ['var(--font-sans)'],
+      sans: ['Montserrat', 'var(--font-sans)'],
       mono: ['var(--font-mono)'],
     },
     container: {
@@ -66,7 +66,7 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ['InterVariable', 'Inter', 'sans-serif'],
+        sans: ['Montserrat', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
       },
       boxShadow: {
