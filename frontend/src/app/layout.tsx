@@ -1,20 +1,19 @@
-import type { Metadata } from 'next';
-import { Bebas_Neue } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Providers } from '@/components/providers';
 import { Toaster } from 'react-hot-toast';
-import Head from 'next/head';
-
-const bebas = Bebas_Neue({
-  weight: '400',
-  subsets: ['latin'],
-  variable: '--font-bebas',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'SplitMe - Expense Sharing on Morph',
   description: 'Split expenses easily with your friends using blockchain technology',
+  icons: {
+    icon: '/favicon.ico',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#f8f9fa' },
     { media: '(prefers-color-scheme: dark)', color: '#121212' },
@@ -27,11 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${bebas.variable} scroll-smooth`}>
-      <Head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className="min-h-screen bg-background text-foreground font-sans antialiased">
         <div className="relative min-h-screen flex flex-col">
           <div className="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)]">
@@ -45,7 +40,7 @@ export default function RootLayout({
             
             <footer className="py-6 border-t border-border/50 mt-auto">
               <div className="container mx-auto px-4 text-center text-sm text-foreground/70">
-                <p>© {new Date().getFullYear()} SplitMe. All rights reserved.</p>
+                <p>© {new Date().getFullYear()} SplitMe. Powered by Morph. All rights reserved.</p>
               </div>
             </footer>
             

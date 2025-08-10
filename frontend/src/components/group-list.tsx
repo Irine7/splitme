@@ -34,8 +34,8 @@ export function GroupList({ selectedGroupId, onSelectGroup }: GroupListProps) {
     return (
       <div className="text-center py-8">
         <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-        <p className="text-gray-600">No groups yet</p>
-        <p className="text-sm text-gray-500">Create your first group to get started</p>
+        <p className="text-gray-600">No splits yet</p>
+        <p className="text-sm text-gray-500">Create your first split to get started</p>
       </div>
     );
   }

@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract SplitMe is ReentrancyGuard, Pausable, Ownable {
     using SafeERC20 for IERC20;
-
+    
+    IERC20 public usdcToken;
+    
     struct Group {
         uint256 id;
         string name;
@@ -42,7 +44,6 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
     }
 
     // State variables
-    IERC20 public usdcToken;
     uint256 public groupCounter;
     uint256 public expenseCounter;
     uint256 public settlementCounter;
@@ -74,7 +75,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         _;
     }
 
-    constructor(address _usdcToken) {
+    constructor(address initialOwner, address _usdcToken) Ownable(initialOwner) {
         usdcToken = IERC20(_usdcToken);
     }
 

@@ -5,6 +5,7 @@ import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { ReactNode, useMemo } from 'react';
+import { ThemeProvider } from './theme-provider';
 
 // Morph Holesky Testnet configuration
 const morphHolesky = {
@@ -53,15 +54,25 @@ const getQueryClient = () => {
   return client;
 };
 
-export function Providers({ children }: { children: ReactNode }) {
-  const queryClient = useMemo(() => getQueryClient(), []);
-  const config = useMemo(() => getWagmiConfig(), []);
+interface ProvidersProps {
+  children: ReactNode;
+}
+
+export function Providers({ children }: ProvidersProps) {
+  const config = getWagmiConfig();
+  const queryClient = getQueryClient();
 
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
-          {children}
+        <RainbowKitProvider modalSize="compact">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+          >
+            {children}
+          </ThemeProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

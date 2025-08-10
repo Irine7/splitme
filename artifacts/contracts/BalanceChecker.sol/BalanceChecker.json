@@ -1,0 +1,93 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "BalanceChecker",
+  "sourceName": "contracts/BalanceChecker.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "balance",
+          "type": "uint256"
+        }
+      ],
+      "name": "BalanceChecked",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "checkBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "balance",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "checkContractBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "checkMyBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080806040523461002857600080546001600160a01b03191633179055610160908161002e8239f35b600080fdfe608080604052600436101561001357600080fd5b600090813560e01c90816350312c9e146100cb575080635f5152261461009a5780638da5cb5b146100735763b37d61f81461004d57600080fd5b346100705780600319360112610070576020610068336100e9565b604051908152f35b80fd5b5034610070578060031936011261007057546040516001600160a01b039091168152602090f35b503461007057602036600319011261007057600435906001600160a01b0382168203610070576020610068836100e9565b9050346100e557816003193601126100e557602090478152f35b5080fd5b604080516001600160a01b0383168152913160208301819052917f99fd1b4b1c3d2adfe8295d40a886856c6fa50e4a821d330c781d67c582bc3d999190a19056fea2646970667358221220282ca436190ba5dd82b4f2f6e0e27e7b3afb5d81e4b86ae97878e6e6bff6235764736f6c63430008140033",
+  "deployedBytecode": "0x608080604052600436101561001357600080fd5b600090813560e01c90816350312c9e146100cb575080635f5152261461009a5780638da5cb5b146100735763b37d61f81461004d57600080fd5b346100705780600319360112610070576020610068336100e9565b604051908152f35b80fd5b5034610070578060031936011261007057546040516001600160a01b039091168152602090f35b503461007057602036600319011261007057600435906001600160a01b0382168203610070576020610068836100e9565b9050346100e557816003193601126100e557602090478152f35b5080fd5b604080516001600160a01b0383168152913160208301819052917f99fd1b4b1c3d2adfe8295d40a886856c6fa50e4a821d330c781d67c582bc3d999190a19056fea2646970667358221220282ca436190ba5dd82b4f2f6e0e27e7b3afb5d81e4b86ae97878e6e6bff6235764736f6c63430008140033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
