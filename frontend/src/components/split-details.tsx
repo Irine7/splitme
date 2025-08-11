@@ -23,7 +23,7 @@ interface ParticipantWithStatus {
 
 // Define expense categories with icons and colors (copied from other components)
 const EXPENSE_CATEGORIES = [
-  { id: 'restaurants', name: 'Restaurants', icon: '🍔', color: 'bg-amber-100 dark:bg-amber-900/30' },
+  { id: 'bars', name: 'Bars', icon: '🍔', color: 'bg-amber-100 dark:bg-amber-900/30' },
   { id: 'transport', name: 'Transport', icon: '🚗', color: 'bg-blue-100 dark:bg-blue-900/30' },
   { id: 'entertainment', name: 'Entertainment', icon: '🎬', color: 'bg-purple-100 dark:bg-purple-900/30' },
   { id: 'travel', name: 'Travel', icon: '✈️', color: 'bg-green-100 dark:bg-green-900/30' },
@@ -123,7 +123,7 @@ export function SplitDetails({ groupId }: SplitDetailsProps) {
       <div className="glass-card p-6 animate-pulse">
         <div className="h-8 bg-secondary/30 dark:bg-white/10 rounded mb-4 w-1/3"></div>
         <div className="h-6 bg-secondary/30 dark:bg-white/10 rounded mb-6 w-1/2"></div>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {[1, 2, 3].map(i => (
             <div key={i} className="h-12 bg-secondary/30 dark:bg-white/10 rounded"></div>
           ))}
@@ -170,7 +170,7 @@ export function SplitDetails({ groupId }: SplitDetailsProps) {
           <Users className="w-5 h-5 mr-2" />
           Participants ({participants.length})
         </h3>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {participants.map((participant, index) => (
             <div 
               key={index} 

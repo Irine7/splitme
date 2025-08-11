@@ -15,6 +15,7 @@ const buttonVariants = cva(
         link: 'text-accent underline-offset-4 hover:underline hover:opacity-80',
         subtle: 'bg-hover-bg text-foreground/80 hover:bg-hover-bg/80 hover:text-foreground',
         gradient: 'bg-gradient-to-r from-accent to-accent/80 text-white hover:shadow-lg hover:shadow-accent/20',
+        purple: 'border border-gray-600 text-gray-700 hover:bg-purple-50 hover:text-purple-600 dark:text-gray-300 dark:hover:bg-purple-900/30 dark:hover:text-purple-400 px-4 py-2 rounded-lg font-medium transition-colors',
       },
       size: {
         default: 'h-10 px-5 py-2.5 rounded-lg text-sm',
