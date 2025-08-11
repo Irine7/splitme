@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Receipt, DollarSign, Clock } from 'lucide-react';
 import { SettleExpenseModal } from './modals/settle-expense-modal';
+import { useGroupStore, Group } from '@/stores/group-store';
 
 interface ExpenseListProps {
   groupId: number;
@@ -15,29 +16,59 @@ interface ExpenseListProps {
 export function ExpenseList({ groupId }: ExpenseListProps) {
   const { address } = useAccount();
   const [selectedExpenseId, setSelectedExpenseId] = useState<number | null>(null);
+  const { groups } = useGroupStore();
+  
+  // Get user groups from blockchain
+  const { data: userGroups } = useReadContract({
+    address: CONTRACTS.SPLIT_ME,
+    abi: SPLIT_ME_ABI,
+    functionName: 'getUserGroups',
+    args: address ? [address] : undefined,
+  });
+  
+  // Define extended Group interface with category
+  interface ExtendedGroup extends Group {
+    category?: string;
+  }
 
-  // This is a simplified version - in a real app, you'd want to track expenses in the contract
-  // For now, we'll show a placeholder structure
-  const expenses = [
-    {
-      id: 1,
-      description: "Dinner at Italian Restaurant",
-      amount: 120.50,
-      paidBy: "0x1234567890123456789012345678901234567890",
-      participants: 4,
-      date: Date.now() / 1000 - 86400,
-      settled: false
-    },
-    {
-      id: 2,
-      description: "Uber ride to airport",
-      amount: 45.25,
-      paidBy: address,
-      participants: 3,
-      date: Date.now() / 1000 - 172800,
-      settled: true
-    }
-  ];
+  // Combine groups from blockchain and Zustand store
+  const combinedGroups: ExtendedGroup[] = [];
+  
+  // Add groups from Zustand store
+  if (groups && groups.length > 0) {
+    // Cast groups to ExtendedGroup[] to handle category property
+    combinedGroups.push(...groups as ExtendedGroup[]);
+  }
+  
+  // Add groups from blockchain that aren't already in the store
+  if (userGroups && Array.isArray(userGroups) && userGroups.length > 0) {
+    userGroups.forEach((groupId) => {
+      const id = Number(groupId);
+      if (!combinedGroups.some(g => g.id === id)) {
+        // This group is in the blockchain but not in our store yet
+        combinedGroups.push({
+          id,
+          name: `Split #${id}`,
+          creator: '0x0000000000000000000000000000000000000000' as `0x${string}`,
+          members: [],
+          createdAt: 0,
+          category: 'other' // Default category
+        });
+      }
+    });
+  }
+  
+  // Convert groups to expenses format for display
+  const expenses = combinedGroups.map((group, index) => ({
+    id: group.id,
+    description: group.name,
+    amount: group.amount || 100 + (index * 25), // Use actual amount if available, otherwise placeholder
+    paidBy: group.creator,
+    participants: group.members.length || 2, // Default to 2 if no members
+    date: group.createdAt || (Date.now() / 1000 - (86400 * index)),
+    settled: false,
+    category: group.category || 'other'
+  }));
 
   if (expenses.length === 0) {
     return (

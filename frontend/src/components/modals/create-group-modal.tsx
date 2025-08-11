@@ -20,6 +20,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 type Log = {
 	topics: string[];
@@ -35,8 +36,8 @@ interface CreateGroupModalProps {
 // Define expense categories with icons and colors
 const EXPENSE_CATEGORIES = [
 	{
-		id: 'food',
-		name: 'Food',
+		id: 'restaurants',
+		name: 'Restaurants',
 		icon: '🍔',
 		color: 'bg-amber-100 dark:bg-amber-900/30',
 	},
@@ -89,11 +90,19 @@ export function CreateGroupModal({
 	initialCategory = null,
 }: CreateGroupModalProps) {
 	const [groupName, setGroupName] = useState('');
+	const [splitAmount, setSplitAmount] = useState<number>(0);
 	const [category, setCategory] = useState(initialCategory || 'other');
 	const [participants, setParticipants] = useState<Participant[]>([]);
 	const [newParticipantAddress, setNewParticipantAddress] = useState('');
 	const [newParticipantName, setNewParticipantName] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
+	const [hostAddress, setHostAddress] = useState<string>('');
+	const [errors, setErrors] = useState<{
+		groupName?: boolean;
+		splitAmount?: boolean;
+		participants?: boolean;
+		host?: boolean;
+	}>({});
 	const { address } = useAccount();
 	const { addGroup } = useGroupStore();
 
@@ -158,8 +167,16 @@ export function CreateGroupModal({
 									address as `0x${string}`,
 									...participants.map((p) => p.address as `0x${string}`),
 								],
+								participantNames: {
+									[address as string]: 'You (Current User)',
+									...participants.reduce(
+										(acc, p) => ({ ...acc, [p.address]: p.name }),
+										{}
+									),
+								},
 								createdAt: Math.floor(Date.now() / 1000),
 								category: category, // Include the selected category
+								amount: splitAmount > 0 ? splitAmount : undefined, // Include the split amount if provided
 							},
 						],
 					});
@@ -214,13 +231,26 @@ export function CreateGroupModal({
 		setParticipants(updatedParticipants);
 	};
 
+	// Validate form
+	const validateForm = () => {
+		const newErrors = {
+			groupName: !groupName.trim(),
+			splitAmount: splitAmount <= 0,
+			participants: participants.length === 0,
+			host: !hostAddress,
+		};
+
+		setErrors(newErrors);
+
+		return !Object.values(newErrors).some((error) => error);
+	};
+
+	// Handle submit
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		const trimmedName = groupName?.trim() || '';
-
-		if (!trimmedName) {
-			toast.error('Please enter a group name');
+		if (!validateForm()) {
+			toast.error('Please fill in all required fields');
 			return;
 		}
 
@@ -263,14 +293,22 @@ export function CreateGroupModal({
 			const tempGroupId = Math.floor(Math.random() * 1000000); // Temporary ID until transaction confirms
 			addGroup({
 				id: tempGroupId,
-				name: trimmedName,
-				creator: address as `0x${string}`,
+				name: groupName.trim(),
+				creator: hostAddress as `0x${string}`, // Use selected host address
 				members: [
 					address as `0x${string}`,
 					...participants.map((p) => p.address as `0x${string}`),
 				],
+				participantNames: {
+					[address as string]: 'You (Current User)',
+					...participants.reduce(
+						(acc, p) => ({ ...acc, [p.address]: p.name }),
+						{}
+					),
+				},
 				createdAt: Math.floor(Date.now() / 1000),
 				category: category, // Save the selected category
+				amount: splitAmount, // Always save the split amount
 			});
 
 			toast.success('Creating split...');
@@ -303,35 +341,94 @@ export function CreateGroupModal({
 					<div className="space-y-6">
 						{/* Split Name */}
 						<div className="space-y-2">
-							<Label htmlFor="groupName">Split Name</Label>
+							<Label htmlFor="groupName" className="flex items-center gap-1">
+								Split Name <span className="text-red-500">*</span>
+							</Label>
 							<Input
 								id="groupName"
 								type="text"
 								value={groupName}
-								onChange={(e) => setGroupName(e.target.value)}
+								onChange={(e) => {
+									setGroupName(e.target.value);
+									if (errors.groupName) {
+										setErrors({ ...errors, groupName: !e.target.value.trim() });
+									}
+								}}
 								placeholder="e.g., Weekend Trip, Rent Split"
 								disabled={isLoading || isConfirming}
 								maxLength={50}
+								className={cn(
+									errors.groupName &&
+										'border-red-500 focus-visible:ring-red-500'
+								)}
 							/>
+							{errors.groupName && (
+								<p className="text-xs text-red-500">Split name is required</p>
+							)}
+						</div>
+
+						{/* Split Amount */}
+						<div className="space-y-2">
+							<Label htmlFor="splitAmount" className="flex items-center gap-1">
+								Split Amount <span className="text-red-500">*</span>
+							</Label>
+							<div className="relative">
+								<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+									<span className="text-gray-500 sm:text-sm">$</span>
+								</div>
+								<Input
+									id="splitAmount"
+									type="number"
+									value={splitAmount}
+									onChange={(e) => {
+										const value = parseFloat(e.target.value) || 0;
+										setSplitAmount(value);
+										if (errors.splitAmount) {
+											setErrors({ ...errors, splitAmount: value <= 0 });
+										}
+									}}
+									placeholder="0.00"
+									min="0"
+									step="0.01"
+									className={cn(
+										'pl-7',
+										errors.splitAmount &&
+											'border-red-500 focus-visible:ring-red-500'
+									)}
+									disabled={isLoading || isConfirming}
+								/>
+							</div>
+							{errors.splitAmount ? (
+								<p className="text-xs text-red-500">
+									Split amount is required and must be greater than 0
+								</p>
+							) : (
+								<p className="text-xs text-muted-foreground">
+									Enter the total amount for this split
+								</p>
+							)}
 						</div>
 
 						{/* Category Selection */}
 						<div className="space-y-2">
 							<Label htmlFor="category">Expense Category</Label>
-							<div className="grid grid-cols-4 gap-2">
+							<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
 								{EXPENSE_CATEGORIES.map((cat) => (
 									<div
 										key={cat.id}
 										onClick={() => {
 											setCategory(cat.id);
-											toast.success(`Category set to ${cat.name}`);
 										}}
-										className={` flex flex-col items-center justify-center p-2 rounded-md cursor-pointer transition-all ${
-											cat.color
-										} ${category === cat.id ? 'ring-2 ring-primary' : ''}`}
+										className={cn(
+											'flex items-center gap-2 p-3 rounded-md cursor-pointer transition-all border w-full',
+											cat.color,
+											category === cat.id
+												? 'ring-2 ring-primary border-primary'
+												: 'border-transparent'
+										)}
 									>
-										<span className="text-2xl">{cat.icon}</span>
-										<span className="text-xs mt-1 text-center">{cat.name}</span>
+										<Tag className="w-5 h-5 flex-shrink-0" />
+										<span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis">{cat.name}</span>
 									</div>
 								))}
 							</div>
@@ -339,7 +436,14 @@ export function CreateGroupModal({
 
 						{/* Participants */}
 						<div className="space-y-3">
-							<Label>Participants</Label>
+							<Label className="flex items-center gap-1">
+								Participants <span className="text-red-500">*</span>
+								{errors.participants && (
+									<span className="text-xs text-red-500 ml-2">
+										(At least one participant required)
+									</span>
+								)}
+							</Label>
 
 							{/* Current user */}
 							<div className="flex items-center p-3 bg-primary/10 rounded-md">
@@ -355,7 +459,7 @@ export function CreateGroupModal({
 											: 'Your wallet'}
 									</p>
 									<p className="text-xs text-muted-foreground">
-										You (Group Creator)
+										You (Current User)
 									</p>
 								</div>
 							</div>
@@ -396,42 +500,116 @@ export function CreateGroupModal({
 								</div>
 							)}
 
-							{/* Add Participant Form */}
-							<div className="space-y-2 pt-2 border-t">
-								<p className="text-sm font-medium">Add Participant</p>
-								<div className="flex gap-2">
-									<Input
-										placeholder="0x... Wallet Address"
-										value={newParticipantAddress}
-										onChange={(e) => setNewParticipantAddress(e.target.value)}
-										disabled={isLoading || isConfirming}
-										className="flex-1"
-									/>
-									<Input
-										placeholder="Name"
-										value={newParticipantName}
-										onChange={(e) => setNewParticipantName(e.target.value)}
-										disabled={isLoading || isConfirming}
-										className="flex-1"
-									/>
-									<Button
-										type="button"
-										onClick={addParticipant}
-										disabled={isLoading || isConfirming}
-										size="icon"
-									>
-										<Plus className="w-4 h-4" />
-									</Button>
+							{/* Add Participant */}
+							<div className="space-y-3">
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+									<div>
+										<Label htmlFor="participantName" className="sr-only">
+											Participant Name
+										</Label>
+										<Input
+											id="participantName"
+											type="text"
+											value={newParticipantName}
+											onChange={(e) => setNewParticipantName(e.target.value)}
+											placeholder="Participant Name"
+											disabled={isLoading || isConfirming}
+											className={cn(
+												errors.participants &&
+													participants.length === 0 &&
+													'border-red-500 focus-visible:ring-red-500'
+											)}
+										/>
+									</div>
+									<div>
+										<Label htmlFor="participantAddress" className="sr-only">
+											Participant Address
+										</Label>
+										<Input
+											id="participantAddress"
+											type="text"
+											value={newParticipantAddress}
+											onChange={(e) => setNewParticipantAddress(e.target.value)}
+											placeholder="0x..."
+											disabled={isLoading || isConfirming}
+											className={cn(
+												errors.participants &&
+													participants.length === 0 &&
+													'border-red-500 focus-visible:ring-red-500'
+											)}
+										/>
+									</div>
 								</div>
+								<Button
+									type="button"
+									variant="outline"
+									className="w-full"
+									onClick={() => {
+										addParticipant();
+										if (errors.participants && participants.length > 0) {
+											setErrors({ ...errors, participants: false });
+										}
+									}}
+									disabled={
+										!newParticipantAddress ||
+										!newParticipantName ||
+										isLoading ||
+										isConfirming
+									}
+								>
+									<Plus className="w-4 h-4 mr-2" />
+									Add Participant
+								</Button>
 							</div>
 						</div>
 					</div>
 
-					<div className="flex gap-3 pt-6 border-t mt-6">
+					{/* Host Selection */}
+					<div className="space-y-2">
+						<Label htmlFor="hostAddress" className="flex items-center gap-1">
+							Split Host <span className="text-red-500">*</span>
+						</Label>
+						<Select
+							value={hostAddress}
+							onValueChange={(value) => {
+								setHostAddress(value);
+								if (errors.host) {
+									setErrors({ ...errors, host: !value });
+								}
+							}}
+							disabled={isLoading || isConfirming}
+						>
+							<SelectTrigger
+								className={cn(
+									errors.host && 'border-red-500 focus-visible:ring-red-500'
+								)}
+							>
+								<SelectValue placeholder="Select host" />
+							</SelectTrigger>
+							<SelectContent>
+								{address && (
+									<SelectItem value={address}>
+										You (Current User) - {address.substring(0, 6)}...
+										{address.substring(address.length - 4)}
+									</SelectItem>
+								)}
+								{participants.map((p, index) => (
+									<SelectItem key={index} value={p.address}>
+										{p.name} - {p.address.substring(0, 6)}...
+										{p.address.substring(p.address.length - 4)}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						{errors.host && (
+							<p className="text-xs text-red-500">Split host is required</p>
+						)}
+					</div>
+
+					<div className="flex justify-end gap-2">
 						<Button
 							type="button"
 							variant="outline"
-							className="flex-1"
 							onClick={onClose}
 							disabled={isLoading || isConfirming}
 						>
@@ -439,10 +617,22 @@ export function CreateGroupModal({
 						</Button>
 						<Button
 							type="submit"
-							className="flex-1"
-							disabled={!groupName.trim() || isLoading || isConfirming}
+							disabled={
+								isLoading ||
+								isConfirming ||
+								!groupName.trim() ||
+								splitAmount <= 0 ||
+								participants.length === 0 ||
+								!hostAddress
+							}
+							className="relative"
 						>
-							{isLoading || isConfirming ? 'Creating...' : 'Create Split'}
+							{isLoading && (
+								<div className="absolute inset-0 flex items-center justify-center bg-primary">
+									<div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+								</div>
+							)}
+							Create Split
 						</Button>
 					</div>
 				</form>

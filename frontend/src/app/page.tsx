@@ -5,16 +5,32 @@ import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { GroupList } from '@/components/group-list';
 import { ExpenseList } from '@/components/expense-list';
+import { SplitDetails } from '@/components/split-details';
 import { BalanceCard } from '@/components/balance-card';
 import { Plus, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CreateGroupModal } from '@/components/modals/create-group-modal';
 import { GroupCarousel } from '@/components/group-carousel';
+import { useGroupStore } from '@/stores/group-store';
+import { useReadContract } from 'wagmi';
+import { CONTRACTS, SPLIT_ME_ABI } from '@/constants/contracts';
 
 export default function HomePage() {
-	const { isConnected } = useAccount();
+	const { isConnected, address } = useAccount();
 	const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
 	const [showCreateGroup, setShowCreateGroup] = useState(false);
+	const { groups } = useGroupStore();
+	
+	const { data: userGroups } = useReadContract({
+		address: CONTRACTS.SPLIT_ME,
+		abi: SPLIT_ME_ABI,
+		functionName: 'getUserGroups',
+		args: address ? [address] : undefined,
+	});
+	
+	// Check if user has any splits (from blockchain or Zustand store)
+	const hasGroups = (groups && groups.length > 0) || 
+		(userGroups && Array.isArray(userGroups) && userGroups.length > 0);
 
 	if (!isConnected) {
 		return (
@@ -101,8 +117,7 @@ export default function HomePage() {
 					<div className="lg:col-span-3">
 						{selectedGroupId ? (
 							<div className="space-y-6">
-								<BalanceCard groupId={selectedGroupId} />
-								<ExpenseList groupId={selectedGroupId} />
+								<SplitDetails groupId={selectedGroupId} />
 							</div>
 						) : (
 							<div className="space-y-8">
@@ -119,18 +134,20 @@ export default function HomePage() {
 									<GroupCarousel onSelectGroup={setSelectedGroupId} />
 								</div>
 
+								{!hasGroups && (
 								<div className="glass-card p-8 text-center border-gray-200 dark:border-gray-800">
 									<div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-4 mx-auto">
 										<div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
 											<Plus className="w-5 h-5 text-accent" />
 										</div>
 									</div>
-									<h3 className="text-xl font-medium mb-2">No Active Groups</h3>
+									<h3 className="text-xl font-medium mb-2">No Active Splits</h3>
 									<p className="text-foreground/70 max-w-md mx-auto">
-										You don't have any active expense sharing groups yet. Create
-										a new group above to get started.
+										You don't have any active expense sharing splits yet. Create
+										a new split above to get started.
 									</p>
 								</div>
+							)}
 							</div>
 						)}
 					</div>

@@ -1,12 +1,20 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+export interface Participant {
+	address: `0x${string}`;
+	name: string;
+}
+
 export interface Group {
 	id: number;
 	name: string;
 	creator: `0x${string}`;
 	members: `0x${string}`[];
+	participantNames?: Record<string, string>; // Map of address to name
 	createdAt: number;
+	category?: string;
+	amount?: number;
 }
 
 interface GroupState {
