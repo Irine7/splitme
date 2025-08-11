@@ -2,7 +2,7 @@
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
-import { Github, Menu, X } from 'lucide-react';
+import { Github, Menu, Wallet, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import Image from 'next/image';
@@ -28,26 +28,26 @@ export function Navigation() {
           <div className="hidden md:flex items-center space-x-1">
             {isConnected && (
               <>
-                <Button
+                {/* <Button
                   variant="ghost"
                   className="text-gray-700 hover:bg-purple-50 hover:text-purple-600 dark:text-gray-300 dark:hover:bg-purple-900/30 dark:hover:text-purple-400 px-4 py-2 rounded-lg font-medium transition-colors"
                   asChild
                 >
                   <Link href="/dashboard">Dashboard</Link>
-                </Button>
+                </Button> */}
                 <Button
                   variant="ghost"
                   className="text-gray-700 hover:bg-purple-50 hover:text-purple-600 dark:text-gray-300 dark:hover:bg-purple-900/30 dark:hover:text-purple-400 px-4 py-2 rounded-lg font-medium transition-colors"
-                  asChild
+                  onClick={() => window.location.href = '/history'}
                 >
-                  <Link href="/history">History</Link>
+                  History
                 </Button>
               </>
             )}
 
             <ThemeToggle />
 
-            <a
+            {/* <a
               href="https://github.com/Irine7/splitme"
               target="_blank"
               rel="noopener noreferrer"
@@ -55,7 +55,7 @@ export function Navigation() {
             >
               <Github className="w-5 h-5" />
               <span className="sr-only">GitHub</span>
-            </a>
+            </a> */}
 
             <div className="ml-2">
               <ConnectButton
@@ -112,11 +112,19 @@ export function Navigation() {
               </>
             )}
             <div className="pt-2 border-t border-gray-200 dark:border-gray-800">
-              <ConnectButton
-                showBalance={false}
-                accountStatus="address"
-                chainStatus="none"
-              />
+						<ConnectButton.Custom>
+							{({ openConnectModal }) => (
+								<Button
+									onClick={openConnectModal}
+									size="lg"
+									className="group relative overflow-hidden text-gray-300 hover:bg-purple-50 hover:text-purple-600 dark:text-gray-300 dark:hover:bg-purple-900/30 dark:hover:text-purple-400"
+								>
+									<Wallet className="w-5 h-5 mr-2" />
+									Connect Wallet
+									<span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+								</Button>
+							)}
+						</ConnectButton.Custom>
             </div>
           </div>
         </div>

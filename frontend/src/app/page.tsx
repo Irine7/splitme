@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Navigation } from '@/components/nav';
 import { GroupList } from '@/components/group-list';
 import { ExpenseList } from '@/components/expense-list';
 import { BalanceCard } from '@/components/balance-card';
 import { Plus, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CreateGroupModal } from '@/components/modals/create-group-modal';
+import { GroupCarousel } from '@/components/group-carousel';
 
 export default function HomePage() {
 	const { isConnected } = useAccount();
@@ -18,21 +18,21 @@ export default function HomePage() {
 
 	if (!isConnected) {
 		return (
-			<div className="min-h-screen bg-gradient-to-br from-background to-muted/30 flex items-center justify-center p-4">
-				<div className="glass-card max-w-md w-full p-8 text-center animate-fade-in">
+			<div className="min-h-screen bg-background/50 bg-gradient-to-br from-background to-muted/30 flex items-center justify-center p-4">
+				<div className="glass-card border-gray-200 dark:border-gray-800 max-w-md w-full p-8 text-center animate-fade-in">
 					<h1 className="text-4xl md:text-5xl font-bebas mb-4 text-gradient">
 						SplitMe
 					</h1>
 					<p className="text-foreground/80 mb-8 text-lg">
-						Split expenses easily with your friends on Morph Layer 2
+						Split expenses easily with your friends on Morph
 					</p>
-					<div className="flex justify-center">
+					{/* <div className="flex justify-center">
 						<ConnectButton.Custom>
 							{({ openConnectModal }) => (
 								<Button
 									onClick={openConnectModal}
 									size="lg"
-									className="group relative overflow-hidden"
+									className="group relative overflow-hidden text-gray-300 hover:bg-purple-50 hover:text-purple-600 dark:text-gray-300 dark:hover:bg-purple-900/30 dark:hover:text-purple-400"
 								>
 									<Wallet className="w-5 h-5 mr-2" />
 									Connect Wallet
@@ -40,7 +40,7 @@ export default function HomePage() {
 								</Button>
 							)}
 						</ConnectButton.Custom>
-					</div>
+					</div> */}
 				</div>
 			</div>
 		);
@@ -48,13 +48,11 @@ export default function HomePage() {
 
 	return (
 		<div className="min-h-screen bg-background/50">
-			<Navigation />
-
 			<div className="container mx-auto px-4 py-8 max-w-7xl">
-				<div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+				<div className="grid grid-cols-1 lg:grid-cols-4 gap-6 ">
 					{/* Groups Sidebar */}
 					<div className="lg:col-span-1">
-						<div className="glass-card p-6 h-full flex flex-col">
+						<div className="glass-card p-6 h-full flex flex-col border-gray-200 dark:border-gray-800">
 							<div className="flex flex-col items-center justify-between mb-6 pb-4 border-b border-border/30">
 								{/* 3D Object (Rocket) */}
 								<div className="object-3d mb-8">
@@ -107,19 +105,32 @@ export default function HomePage() {
 								<ExpenseList groupId={selectedGroupId} />
 							</div>
 						) : (
-							<div className="glass-card p-12 text-center flex flex-col items-center justify-center min-h-[400px]">
-								<div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mb-6">
-									<div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-										<Plus className="w-5 h-5 text-accent" />
-									</div>
+							<div className="space-y-8">
+								<div className="glass-card p-8 border-gray-200 dark:border-gray-800">
+									<h3 className="text-2xl font-medium mb-6">
+										Create or Join a Split
+									</h3>
+									<p className="text-foreground/70 mb-6">
+										Choose a category below to create a new expense sharing
+										split or join an existing one.
+									</p>
+
+									{/* Group Carousel */}
+									<GroupCarousel onSelectGroup={setSelectedGroupId} />
 								</div>
-								<h3 className="text-2xl font-bebas tracking-wider text-foreground mb-3">
-									Select a group to get started
-								</h3>
-								<p className="text-foreground/70 max-w-md">
-									Choose a group from the sidebar to view expenses and balances,
-									or create a new group to begin.
-								</p>
+
+								<div className="glass-card p-8 text-center border-gray-200 dark:border-gray-800">
+									<div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-4 mx-auto">
+										<div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+											<Plus className="w-5 h-5 text-accent" />
+										</div>
+									</div>
+									<h3 className="text-xl font-medium mb-2">No Active Groups</h3>
+									<p className="text-foreground/70 max-w-md mx-auto">
+										You don't have any active expense sharing groups yet. Create
+										a new group above to get started.
+									</p>
+								</div>
 							</div>
 						)}
 					</div>

@@ -47,7 +47,7 @@ export function BalanceCard({ groupId }: BalanceCardProps) {
   const isOwed = balance > 0;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="glass-card bg-card dark:bg-background/30 rounded-lg shadow-lg p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">{groupName}</h2>
         <div className="flex gap-2">
@@ -72,21 +72,21 @@ export function BalanceCard({ groupId }: BalanceCardProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Your Balance</h3>
+        <div className="bg-secondary/30 dark:bg-background/20 rounded-lg p-4 backdrop-blur-sm border border-border/50 dark:border-white/5">
+          <h3 className="text-sm font-medium text-muted-foreground dark:text-white/70 mb-1">Your Balance</h3>
           <p className={`text-2xl font-bold ${
-            isInDebt ? 'text-red-600' : isOwed ? 'text-green-600' : 'text-gray-900'
+            isInDebt ? 'text-red-500 dark:text-red-400' : isOwed ? 'text-green-500 dark:text-green-400' : 'text-foreground dark:text-white/90'
           }`}>
             {formatCurrency(Math.abs(balance))}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground dark:text-white/50">
             {isInDebt ? 'You owe' : isOwed ? 'You are owed' : 'Settled up'}
           </p>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Total Owed</h3>
-          <p className="text-2xl font-bold text-red-600">
+        <div className="bg-secondary/30 dark:bg-background/20 rounded-lg p-4 backdrop-blur-sm border border-border/50 dark:border-white/5">
+          <h3 className="text-sm font-medium text-muted-foreground dark:text-white/70 mb-1">Total Owed</h3>
+          <p className="text-2xl font-bold text-red-500 dark:text-red-400">
             {groupBalances ? formatCurrency(
               groupBalances[1]
                 .filter((bal: bigint) => bal < 0n)
@@ -95,9 +95,9 @@ export function BalanceCard({ groupId }: BalanceCardProps) {
           </p>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Total Lent</h3>
-          <p className="text-2xl font-bold text-green-600">
+        <div className="bg-secondary/30 dark:bg-background/20 rounded-lg p-4 backdrop-blur-sm border border-border/50 dark:border-white/5">
+          <h3 className="text-sm font-medium text-muted-foreground dark:text-white/70 mb-1">Total Lent</h3>
+          <p className="text-2xl font-bold text-green-500 dark:text-green-400">
             {groupBalances ? formatCurrency(
               groupBalances[1]
                 .filter((bal: bigint) => bal > 0n)

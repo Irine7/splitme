@@ -41,10 +41,10 @@ export function ExpenseList({ groupId }: ExpenseListProps) {
 
   if (expenses.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-        <Receipt className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No expenses yet</h3>
-        <p className="text-gray-600 mb-4">
+      <div className="glass-card bg-card dark:bg-background/30 rounded-lg shadow-lg p-8 text-center">
+        <Receipt className="w-12 h-12 text-muted-foreground dark:text-white/40 mx-auto mb-3" />
+        <h3 className="text-lg font-medium text-foreground dark:text-white/90 mb-2">No expenses yet</h3>
+        <p className="text-muted-foreground dark:text-white/60 mb-4">
           Add your first expense to start tracking shared costs
         </p>
       </div>
@@ -52,9 +52,9 @@ export function ExpenseList({ groupId }: ExpenseListProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
-      <div className="p-6 border-b">
-        <h3 className="text-lg font-semibold">Recent Expenses</h3>
+    <div className="glass-card bg-card dark:bg-background/30 rounded-lg shadow-lg">
+      <div className="p-6 border-b border-border/50 dark:border-white/10">
+        <h3 className="text-lg font-semibold text-foreground dark:text-white/90">Recent Expenses</h3>
       </div>
 
       <div className="divide-y">
@@ -88,19 +88,19 @@ function ExpenseItem({ expense, currentUser, onSettle }: {
   const userShare = expense.amount / expense.participants;
 
   return (
-    <div className="p-4 hover:bg-gray-50 transition-colors">
+    <div className="p-4 hover:bg-secondary/10 dark:hover:bg-white/5 transition-colors border-border/50 dark:border-white/10">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <h4 className="font-medium text-gray-900">{expense.description}</h4>
+            <h4 className="font-medium text-foreground dark:text-white/90">{expense.description}</h4>
             {expense.settled && (
-              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+              <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs font-medium rounded-full">
                 Settled
               </span>
             )}
           </div>
           
-          <div className="flex items-center gap-4 text-sm text-gray-600">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground dark:text-white/60">
             <span className="flex items-center gap-1">
               <DollarSign className="w-4 h-4" />
               Total: {formatCurrency(expense.amount)}
@@ -112,11 +112,11 @@ function ExpenseItem({ expense, currentUser, onSettle }: {
           </div>
 
           <div className="mt-2 text-sm">
-            <span className="text-gray-600">
+            <span className="text-muted-foreground dark:text-white/60">
               Paid by: {isPaidByUser ? 'You' : formatAddress(expense.paidBy)}
             </span>
-            <span className="mx-2">•</span>
-            <span className="text-gray-600">
+            <span className="mx-2 text-muted-foreground/50 dark:text-white/30">•</span>
+            <span className="text-muted-foreground dark:text-white/60">
               Split {expense.participants} ways ({formatCurrency(userShare)} each)
             </span>
           </div>
@@ -125,11 +125,11 @@ function ExpenseItem({ expense, currentUser, onSettle }: {
         <div className="flex flex-col items-end gap-2">
           <div className="text-right">
             <div className={`font-semibold ${
-              isPaidByUser ? 'text-green-600' : 'text-red-600'
+              isPaidByUser ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'
             }`}>
               {isPaidByUser ? '+' : '-'}{formatCurrency(isPaidByUser ? expense.amount - userShare : userShare)}
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-muted-foreground dark:text-white/50">
               {isPaidByUser ? 'You are owed' : 'You owe'}
             </div>
           </div>
