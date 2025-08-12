@@ -22,6 +22,7 @@ interface GroupState {
 	isLoading: boolean;
 	error: string | null;
 	addGroup: (group: Group) => void;
+	deleteGroup: (groupId: number) => void;
 	setGroups: (groups: Group[]) => void;
 	setLoading: (isLoading: boolean) => void;
 	setError: (error: string | null) => void;
@@ -49,6 +50,10 @@ export const useGroupStore = create<GroupState>()(
 			addGroup: (group) =>
 				set((state) => ({
 					groups: [...state.groups, group],
+				})),
+			deleteGroup: (groupId) =>
+				set((state) => ({
+					groups: state.groups.filter((group) => group.id !== groupId),
 				})),
 			setGroups: (groups) => set({ groups }),
 			setLoading: (isLoading) => set({ isLoading }),

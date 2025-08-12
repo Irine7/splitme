@@ -530,7 +530,9 @@ export function CreateGroupModal({
 											onChange={(e) => setNewParticipantName(e.target.value)}
 											placeholder="Participant Name"
 											onFocus={(e) => (e.target.placeholder = '')}
-											onBlur={(e) => (e.target.placeholder = 'Participant Name')}
+											onBlur={(e) =>
+												(e.target.placeholder = 'Participant Name')
+											}
 											disabled={isLoading || isConfirming}
 											className={cn(
 												'placeholder:text-gray-500',
@@ -590,7 +592,7 @@ export function CreateGroupModal({
 					<div className="my-4">
 						<div className="mb-2">
 							<Label htmlFor="hostAddress" className="flex items-center gap-1">
-								Split Host <span className="text-red-500">*</span>
+								Host <span className="text-red-500">*</span>
 							</Label>
 						</div>
 						<Select
@@ -612,9 +614,7 @@ export function CreateGroupModal({
 							</SelectTrigger>
 							<SelectContent>
 								{address && (
-									<SelectItem value={address}>
-										Me (Current User)
-									</SelectItem>
+									<SelectItem value={address}>Me (Current User)</SelectItem>
 								)}
 								{participants.map((p, index) => (
 									<SelectItem key={index} value={p.address}>
@@ -625,7 +625,9 @@ export function CreateGroupModal({
 							</SelectContent>
 						</Select>
 						{errors.host && (
-							<p className="text-xs mt-1 text-red-500">Split host is required</p>
+							<p className="text-xs mt-1 text-red-500">
+								Split host is required
+							</p>
 						)}
 					</div>
 
