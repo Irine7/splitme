@@ -196,7 +196,7 @@ export function CreateGroupModal({
 		processReceipt();
 	}, [isSuccess, receipt, groupName, address, category, participants, onClose]);
 
-	// Add participant to the list
+	// Добавление участника в список
 	const addParticipant = () => {
 		if (!newParticipantAddress || !newParticipantName) {
 			toast.error('Please enter both address and name for the participant');
@@ -242,6 +242,18 @@ export function CreateGroupModal({
 		// Clear input fields
 		setNewParticipantAddress('');
 		setNewParticipantName('');
+	};
+	
+	// Выбор участника из адресной книги
+	const handleAddressBookSelect = (addressBookEntry: string) => {
+		if (addressBookEntry === 'none') return;
+		
+		const { entries } = useAddressBookStore.getState();
+		const [ownerName, address] = addressBookEntry.split('|');
+		
+		// Set the participant fields
+		setNewParticipantName(ownerName);
+		setNewParticipantAddress(address);
 	};
 
 	// Remove participant from the list
@@ -536,6 +548,36 @@ export function CreateGroupModal({
 								</div>
 							)}
 
+							{/* Address Book Selection */}
+							<div className="space-y-2">
+								<Label htmlFor="addressBookSelect" className="text-sm">
+									Select from Address Book
+								</Label>
+								<Select
+									onValueChange={handleAddressBookSelect}
+									disabled={isLoading || isConfirming}
+								>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Select a contact" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="none">-- Select a contact --</SelectItem>
+										{useAddressBookStore.getState().entries.map((entry) => (
+											<SelectItem 
+												key={entry.address} 
+												value={`${entry.ownerName}|${entry.address}`}
+											>
+												{entry.ownerName} ({entry.address.substring(0, 6)}...{entry.address.substring(entry.address.length - 4)})
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+
+							<div  className="space-y-2 text-sm">
+								OR
+							</div>
+
 							{/* Add Participant */}
 							<div className="space-y-2">
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -634,12 +676,11 @@ export function CreateGroupModal({
 							</SelectTrigger>
 							<SelectContent>
 								{address && (
-									<SelectItem value={address}>Me (Current User)</SelectItem>
+									<SelectItem value={address}>Me</SelectItem>
 								)}
 								{participants.map((p, index) => (
 									<SelectItem key={index} value={p.address}>
 										{p.name}
-										{p.address.substring(p.address.length - 4)}
 									</SelectItem>
 								))}
 							</SelectContent>
