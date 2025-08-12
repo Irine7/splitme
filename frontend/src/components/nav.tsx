@@ -38,6 +38,13 @@ export function Navigation() {
                 <Button
                   variant="ghost"
                   className="text-gray-700 hover:bg-purple-50 hover:text-purple-600 dark:text-gray-300 dark:hover:bg-purple-900/30 dark:hover:text-purple-400 px-4 py-2 rounded-lg font-medium transition-colors"
+                  onClick={() => window.location.href = '/address-book'}
+                >
+                  Address Book
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:bg-purple-50 hover:text-purple-600 dark:text-gray-300 dark:hover:bg-purple-900/30 dark:hover:text-purple-400 px-4 py-2 rounded-lg font-medium transition-colors"
                   onClick={() => window.location.href = '/history'}
                 >
                   History

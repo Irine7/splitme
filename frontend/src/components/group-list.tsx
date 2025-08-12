@@ -222,14 +222,14 @@ function GroupItem({
 			</Button>
 
 			{/* Debug button */}
-			<Button
+			{/* <Button
 				variant="ghost"
 				size="icon"
 				className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity ml-5"
 				onClick={handleDelete}
 			>
 				<Trash2 className="w-4 h-4 text-red-500" />
-			</Button>
+			</Button> */}
 		</div>
 	);
 }

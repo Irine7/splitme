@@ -91,14 +91,14 @@ export default function HomePage() {
 										</svg>
 									</div>
 								</div>
-								<h2 className="text-2xl font-bebas tracking-wider text-foreground">
-									Your Splits
+								<h2 className="text-2xl mb-2 font-bebas tracking-wider text-foreground">
+									My Splits
 								</h2>
 								<Button
 									onClick={() => setShowCreateGroup(true)}
-									variant="outline"
+									variant="purple"
 									size="sm"
-									className="border-border/50 hover:border-accent/50 transition-colors"
+									className="border-gray-600 hover:border-accent/50 transition-colors"
 								>
 									<Plus className="w-4 h-4 mr-1.5" />
 									Add New Split

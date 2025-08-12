@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { X, Plus, Trash2, Users, CreditCard, Tag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useGroupStore } from '@/stores/group-store';
+import { useAddressBookStore } from '@/stores/address-book-store';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -211,6 +212,7 @@ export function CreateGroupModal({
 			return;
 		}
 
+		// Add to participants list
 		setParticipants([
 			...participants,
 			{
@@ -218,6 +220,24 @@ export function CreateGroupModal({
 				name: newParticipantName,
 			},
 		]);
+
+		// Check if address exists in address book, if not - add it
+		const { entries, addEntry } = useAddressBookStore.getState();
+		const existingEntry = entries.find(
+			(entry) => entry.address.toLowerCase() === newParticipantAddress.toLowerCase()
+		);
+
+		if (!existingEntry) {
+			// Add to address book
+			const result = addEntry({
+				address: newParticipantAddress as `0x${string}`,
+				ownerName: newParticipantName.trim()
+			});
+
+			if (result.success) {
+				toast.success(`Address ${newParticipantAddress} added to address book`);
+			}
+		}
 
 		// Clear input fields
 		setNewParticipantAddress('');
