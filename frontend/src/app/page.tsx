@@ -9,8 +9,8 @@ import { SplitDetails } from '@/components/split-details';
 import { BalanceCard } from '@/components/balance-card';
 import { Plus, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CreateGroupModal } from '@/components/modals/create-group-modal';
-import { GroupCarousel } from '@/components/group-carousel';
+import { CreateSplitModal } from '@/components/modals/create-split-modal';
+import { SplitCarousel } from '@/components/split-carousel';
 import { useGroupStore } from '@/stores/group-store';
 import { useReadContract } from 'wagmi';
 import { CONTRACTS, SPLIT_ME_ABI } from '@/constants/contracts';
@@ -20,16 +20,17 @@ export default function HomePage() {
 	const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
 	const [showCreateGroup, setShowCreateGroup] = useState(false);
 	const { groups } = useGroupStore();
-	
+
 	const { data: userGroups } = useReadContract({
 		address: CONTRACTS.SPLIT_ME,
 		abi: SPLIT_ME_ABI,
 		functionName: 'getUserGroups',
 		args: address ? [address] : undefined,
 	});
-	
+
 	// Check if user has any splits (from blockchain or Zustand store)
-	const hasGroups = (groups && groups.length > 0) || 
+	const hasGroups =
+		(groups && groups.length > 0) ||
 		(userGroups && Array.isArray(userGroups) && userGroups.length > 0);
 
 	if (!isConnected) {
@@ -131,30 +132,32 @@ export default function HomePage() {
 									</p>
 
 									{/* Group Carousel */}
-									<GroupCarousel onSelectGroup={setSelectedGroupId} />
+									<SplitCarousel onSelectGroup={setSelectedGroupId} />
 								</div>
 
 								{!hasGroups && (
-								<div className="glass-card p-8 text-center border-gray-200 dark:border-gray-800">
-									<div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-4 mx-auto">
-										<div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-											<Plus className="w-5 h-5 text-accent" />
+									<div className="glass-card p-8 text-center border-gray-200 dark:border-gray-800">
+										<div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-4 mx-auto">
+											<div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+												<Plus className="w-5 h-5 text-accent" />
+											</div>
 										</div>
+										<h3 className="text-xl font-medium mb-2">
+											No Active Splits
+										</h3>
+										<p className="text-foreground/70 max-w-md mx-auto">
+											You don't have any active expense sharing splits yet.
+											Create a new split above to get started.
+										</p>
 									</div>
-									<h3 className="text-xl font-medium mb-2">No Active Splits</h3>
-									<p className="text-foreground/70 max-w-md mx-auto">
-										You don't have any active expense sharing splits yet. Create
-										a new split above to get started.
-									</p>
-								</div>
-							)}
+								)}
 							</div>
 						)}
 					</div>
 				</div>
 			</div>
 
-			<CreateGroupModal
+			<CreateSplitModal
 				isOpen={showCreateGroup}
 				onClose={() => setShowCreateGroup(false)}
 			/>

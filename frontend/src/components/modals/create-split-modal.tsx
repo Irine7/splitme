@@ -28,7 +28,7 @@ type Log = {
 	data: string;
 };
 
-interface CreateGroupModalProps {
+interface CreateSplitModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	initialCategory?: string | null;
@@ -85,11 +85,11 @@ type Participant = {
 	name: string;
 };
 
-export function CreateGroupModal({
+export function CreateSplitModal({
 	isOpen,
 	onClose,
 	initialCategory = null,
-}: CreateGroupModalProps) {
+}: CreateSplitModalProps) {
 	const [groupName, setGroupName] = useState('');
 	const [splitAmount, setSplitAmount] = useState<number>(0);
 	const [category, setCategory] = useState(initialCategory || '');
@@ -224,14 +224,15 @@ export function CreateGroupModal({
 		// Check if address exists in address book, if not - add it
 		const { entries, addEntry } = useAddressBookStore.getState();
 		const existingEntry = entries.find(
-			(entry) => entry.address.toLowerCase() === newParticipantAddress.toLowerCase()
+			(entry) =>
+				entry.address.toLowerCase() === newParticipantAddress.toLowerCase()
 		);
 
 		if (!existingEntry) {
 			// Add to address book
 			const result = addEntry({
 				address: newParticipantAddress as `0x${string}`,
-				ownerName: newParticipantName.trim()
+				ownerName: newParticipantName.trim(),
 			});
 
 			if (result.success) {
@@ -243,14 +244,14 @@ export function CreateGroupModal({
 		setNewParticipantAddress('');
 		setNewParticipantName('');
 	};
-	
+
 	// Выбор участника из адресной книги
 	const handleAddressBookSelect = (addressBookEntry: string) => {
 		if (addressBookEntry === 'none') return;
-		
+
 		const { entries } = useAddressBookStore.getState();
 		const [ownerName, address] = addressBookEntry.split('|');
-		
+
 		// Set the participant fields
 		setNewParticipantName(ownerName);
 		setNewParticipantAddress(address);
@@ -312,7 +313,10 @@ export function CreateGroupModal({
 
 			// Получаем имя пользователя из адресной книги или используем дефолтное
 			const addressBook = useAddressBookStore.getState().entries;
-			const creatorEntry = addressBook.find((entry: AddressEntry) => entry.address.toLowerCase() === address?.toLowerCase());
+			const creatorEntry = addressBook.find(
+				(entry: AddressEntry) =>
+					entry.address.toLowerCase() === address?.toLowerCase()
+			);
 			const creatorName = creatorEntry?.ownerName || 'You';
 
 			// Explicitly type the contract call
@@ -320,7 +324,12 @@ export function CreateGroupModal({
 				address: CONTRACTS.SPLIT_ME as `0x${string}`,
 				abi: SPLIT_ME_ABI,
 				functionName: 'createGroup' as const,
-				args: [groupName.trim(), category || 'other', BigInt(splitAmount || 0), creatorName] as const, // Передаем категорию, сумму и имя создателя
+				args: [
+					groupName.trim(),
+					category || 'other',
+					BigInt(splitAmount || 0),
+					creatorName,
+				] as const, // Передаем категорию, сумму и имя создателя
 			};
 
 			writeContract(contractCall);
@@ -568,20 +577,19 @@ export function CreateGroupModal({
 									<SelectContent>
 										<SelectItem value="none">-- Select a contact --</SelectItem>
 										{useAddressBookStore.getState().entries.map((entry) => (
-											<SelectItem 
-												key={entry.address} 
+											<SelectItem
+												key={entry.address}
 												value={`${entry.ownerName}|${entry.address}`}
 											>
-												{entry.ownerName} ({entry.address.substring(0, 6)}...{entry.address.substring(entry.address.length - 4)})
+												{entry.ownerName} ({entry.address.substring(0, 6)}...
+												{entry.address.substring(entry.address.length - 4)})
 											</SelectItem>
 										))}
 									</SelectContent>
 								</Select>
 							</div>
 
-							<div  className="space-y-2 text-sm">
-								OR
-							</div>
+							<div className="space-y-2 text-sm">OR</div>
 
 							{/* Add Participant */}
 							<div className="space-y-2">
@@ -680,9 +688,7 @@ export function CreateGroupModal({
 								<SelectValue placeholder="Select host" />
 							</SelectTrigger>
 							<SelectContent>
-								{address && (
-									<SelectItem value={address}>Me</SelectItem>
-								)}
+								{address && <SelectItem value={address}>Me</SelectItem>}
 								{participants.map((p, index) => (
 									<SelectItem key={index} value={p.address}>
 										{p.name}

@@ -49,8 +49,26 @@ export default function RootLayout({
             <Toaster
               position="top-right"
               toastOptions={{
-                className: '!bg-card-bg !text-foreground !border !border-border/50 !shadow-lg',
+                className: '',
                 duration: 3000,
+                style: {
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--border)',
+                  boxShadow: 'var(--shadow-lg)',
+                },
+                success: {
+                  iconTheme: {
+                    primary: 'var(--success)',
+                    secondary: 'var(--success-foreground)',
+                  },
+                },
+                error: {
+                  iconTheme: {
+                    primary: 'var(--destructive)',
+                    secondary: 'var(--destructive-foreground)',
+                  },
+                },
               }}
             />
           </Providers>
