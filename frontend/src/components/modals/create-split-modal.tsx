@@ -24,6 +24,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { Portal } from '@/components/ui/portal';
 
 type Log = {
 	topics: string[];
@@ -473,8 +474,9 @@ export function CreateSplitModal({
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 modal-focus-styles">
-			<div className="bg-background dark:bg-background rounded-lg shadow-xl max-w-md w-full">
+		<Portal>
+			<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 modal-focus-styles">
+				<div className="bg-background dark:bg-background rounded-lg shadow-xl max-w-md w-full">
 				{/* <div className="flex items-center justify-between p-6 ">
           <h2 className="text-xl font-semibold">Create New Split</h2>
           <Button
@@ -838,7 +840,8 @@ export function CreateSplitModal({
 						</Button>
 					</div>
 				</form>
+				</div>
 			</div>
-		</div>
+		</Portal>
 	);
 }

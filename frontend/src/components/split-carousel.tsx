@@ -93,74 +93,76 @@ export function SplitCarousel({ onSelectGroup }: SplitCarouselProps) {
 	};
 
 	return (
-		<div className="relative">
-			{/* Carousel Navigation Buttons */}
-			<div className="absolute left-0 top-1/2 -translate-y-1/2 z-10">
-				<Button
-					variant="ghost"
-					size="icon"
-					className="rounded-full bg-background/80 backdrop-blur-sm shadow-md"
-					onClick={() => handleScroll('left')}
-					disabled={scrollPosition <= 0}
+		<>
+			<div className="relative">
+				{/* Carousel Navigation Buttons */}
+				<div className="absolute left-0 top-1/2 -translate-y-1/2 z-10">
+					<Button
+						variant="ghost"
+						size="icon"
+						className="rounded-full bg-background/80 backdrop-blur-sm shadow-md"
+						onClick={() => handleScroll('left')}
+						disabled={scrollPosition <= 0}
+					>
+						<ChevronLeft className="h-5 w-5" />
+					</Button>
+				</div>
+
+				<div className="absolute right-0 top-1/2 -translate-y-1/2 z-10">
+					<Button
+						variant="ghost"
+						size="icon"
+						className="rounded-full bg-background/80 backdrop-blur-sm shadow-md"
+						onClick={() => handleScroll('right')}
+					>
+						<ChevronRight className="h-5 w-5" />
+					</Button>
+				</div>
+
+				{/* Carousel Container */}
+				<div
+					id="group-carousel-container"
+					className="flex overflow-x-auto carousel-scroll gap-4 py-4 px-2 snap-x"
 				>
-					<ChevronLeft className="h-5 w-5" />
-				</Button>
-			</div>
+					{/* Create New Group Card */}
+					{/* <div className="min-w-[280px] w-[280px] snap-start">
+			  <div className="glass-card carousel-card h-[220px] p-6 flex flex-col items-center justify-center text-center cursor-pointer"
+				   onClick={() => setShowCreateGroup(true)}>
+				<div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+				  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+					<Plus className="w-5 h-5 text-accent" />
+				  </div>
+				</div>
+				<h3 className="text-xl font-medium text-foreground mb-2">
+				  Создать новую группу
+				</h3>
+				<p className="text-sm text-foreground/70">
+				  Разделите расходы с друзьями или коллегами
+				</p>
+			  </div>
+			</div> */}
 
-			<div className="absolute right-0 top-1/2 -translate-y-1/2 z-10">
-				<Button
-					variant="ghost"
-					size="icon"
-					className="rounded-full bg-background/80 backdrop-blur-sm shadow-md"
-					onClick={() => handleScroll('right')}
-				>
-					<ChevronRight className="h-5 w-5" />
-				</Button>
-			</div>
-
-			{/* Carousel Container */}
-			<div
-				id="group-carousel-container"
-				className="flex overflow-x-auto carousel-scroll gap-4 py-4 px-2 snap-x"
-			>
-				{/* Create New Group Card */}
-				{/* <div className="min-w-[280px] w-[280px] snap-start">
-          <div className="glass-card carousel-card h-[220px] p-6 flex flex-col items-center justify-center text-center cursor-pointer"
-               onClick={() => setShowCreateGroup(true)}>
-            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-4">
-              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                <Plus className="w-5 h-5 text-accent" />
-              </div>
-            </div>
-            <h3 className="text-xl font-medium text-foreground mb-2">
-              Создать новую группу
-            </h3>
-            <p className="text-sm text-foreground/70">
-              Разделите расходы с друзьями или коллегами
-            </p>
-          </div>
-        </div> */}
-
-				{/* Category Cards */}
-				{EXPENSE_CATEGORIES.map((category) => (
-					<div key={category.id} className="min-w-[280px] w-[280px] snap-start">
-						<div
-							className={`glass-card carousel-card category-card h-[220px] p-6 flex flex-col items-center justify-center text-center cursor-pointer ${category.color}`}
-							onClick={() => handleCreateGroup(category.id)}
-						>
-							<div className="text-4xl mb-4 category-icon">{category.icon}</div>
-							<h3 className="text-xl font-medium text-foreground mb-2">
-								{category.name}
-							</h3>
-							<p className="text-sm text-foreground/70">
-								Create a split for this expense category
-							</p>
+					{/* Category Cards */}
+					{EXPENSE_CATEGORIES.map((category) => (
+						<div key={category.id} className="min-w-[280px] w-[280px] snap-start">
+							<div
+								className={`glass-card carousel-card category-card h-[220px] p-6 flex flex-col items-center justify-center text-center cursor-pointer ${category.color}`}
+								onClick={() => handleCreateGroup(category.id)}
+							>
+								<div className="text-4xl mb-4 category-icon">{category.icon}</div>
+								<h3 className="text-xl font-medium text-foreground mb-2">
+									{category.name}
+								</h3>
+								<p className="text-sm text-foreground/70">
+									Create a split for this expense category
+								</p>
+							</div>
 						</div>
-					</div>
-				))}
+					))}
+				</div>
 			</div>
 
-			{/* Create Group Modal */}
+			{/* Create Group Modal - вынесен за пределы родительского div для правильного отображения */}
 			{showCreateGroup && (
 				<CreateSplitModal
 					isOpen={showCreateGroup}
@@ -168,6 +170,6 @@ export function SplitCarousel({ onSelectGroup }: SplitCarouselProps) {
 					initialCategory={selectedCategory}
 				/>
 			)}
-		</div>
+		</>
 	);
 }
