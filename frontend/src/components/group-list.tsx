@@ -40,6 +40,7 @@ export function GroupList({ selectedGroupId, onSelectGroup }: GroupListProps) {
 	if (userGroups && Array.isArray(userGroups) && userGroups.length > 0) {
 		userGroups.forEach((groupId) => {
 			const id = Number(groupId);
+			// Проверяем, нет ли уже группы с таким id в combinedGroups
 			if (!combinedGroups.some((g) => g.id === id)) {
 				// This group is in the blockchain but not in our store yet
 				// We'll add a placeholder that will be updated when selected
@@ -55,8 +56,11 @@ export function GroupList({ selectedGroupId, onSelectGroup }: GroupListProps) {
 			}
 		});
 	}
+	
+	// Удаляем дубликаты групп по id
+	const uniqueGroups = Array.from(new Map(combinedGroups.map(group => [group.id, group])).values());
 
-	if (isLoading && combinedGroups.length === 0) {
+	if (isLoading && uniqueGroups.length === 0) {
 		return (
 			<div className="space-y-2">
 				{[1, 2, 3].map((i) => (
@@ -69,7 +73,7 @@ export function GroupList({ selectedGroupId, onSelectGroup }: GroupListProps) {
 		);
 	}
 
-	if (combinedGroups.length === 0) {
+	if (uniqueGroups.length === 0) {
 		return (
 			<div className="text-center py-8">
 				<Users className="w-12 h-12 text-muted-foreground dark:text-white/40 mx-auto mb-3" />
@@ -85,7 +89,7 @@ export function GroupList({ selectedGroupId, onSelectGroup }: GroupListProps) {
 
 	return (
 		<div className="space-y-2">
-			{combinedGroups.map((group) => (
+			{uniqueGroups.map((group) => (
 				<GroupItem
 					key={group.id}
 					group={group}
@@ -172,14 +176,19 @@ function GroupItem({
 		// We'll always fetch the data, but use it conditionally
 	});
 
-	// Use data from blockchain if available and our group data is incomplete
+	// Используем только данные из локального стора для всех полей
 	let displayName = group.name;
-	let membersCount = group.members.length;
+	
+	// Всегда используем только данные из локального стора для количества участников
+	// Это гарантирует, что мы увидим всех добавленных участников
+	const membersCount = group.members.length;
+	
+	console.log(`GroupItem: group ${group.id} has ${membersCount} members:`, group.members);
 
-	if (groupData && group.members.length === 0) {
-		const [, name, , members] = groupData;
+	// Используем данные из блокчейна только для имени группы, если оно отсутствует в сторе
+	if (groupData && !group.name) {
+		const [, name, , ] = groupData;
 		displayName = name;
-		membersCount = members.length;
 	}
 
 	const handleDelete = (e: React.MouseEvent) => {
@@ -222,14 +231,14 @@ function GroupItem({
 			</Button>
 
 			{/* Debug button */}
-			{/* <Button
+			<Button
 				variant="ghost"
 				size="icon"
 				className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity ml-5"
 				onClick={handleDelete}
 			>
 				<Trash2 className="w-4 h-4 text-red-500" />
-			</Button> */}
+			</Button>
 		</div>
 	);
 }

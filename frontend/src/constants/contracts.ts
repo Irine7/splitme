@@ -1,32 +1,211 @@
 export const CONTRACTS = {
-  EXPENSE_TOKEN: '0x...' as const, // Will be populated after deployment
-  SPLIT_ME: '0x...' as const, // Will be populated after deployment
+  EXPENSE_TOKEN: '0x9444126e1331845278197CEBEC6f2C6Ab1B9B469' as const, // Deployed on Morph Holesky Testnet
+  SPLIT_ME: '0xDb8Fda1b6fb96530b3FbFD2bf1F8F0721Cea036C' as const, // Deployed on Morph Holesky Testnet
 };
 
 export const SPLIT_ME_ABI = [
   // Core functions
-  'function createGroup(string calldata name, string calldata category, uint256 amount, string calldata creatorName) external returns (uint256)',
-  'function updateGroupCategory(uint256 groupId, string calldata newCategory) external',
-  'function updateGroupAmount(uint256 groupId, uint256 newAmount) external',
-  'function addMember(uint256 groupId, address member, string calldata memberName) external',
-  'function createExpense(uint256 groupId, string calldata description, uint256 amount, address[] calldata participants) external returns (uint256)',
-  'function settleExpense(uint256 expenseId, uint256 amount) external',
-  'function settleAllDebts(uint256 groupId) external',
-  'function withdraw() external',
+  {
+    name: 'createGroup',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'name', type: 'string' },
+      { name: 'category', type: 'string' },
+      { name: 'amount', type: 'uint256' },
+      { name: 'creatorName', type: 'string' }
+    ],
+    outputs: [{ name: '', type: 'uint256' }]
+  },
+  {
+    name: 'updateGroupCategory',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'groupId', type: 'uint256' },
+      { name: 'newCategory', type: 'string' }
+    ],
+    outputs: []
+  },
+  {
+    name: 'updateGroupAmount',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'groupId', type: 'uint256' },
+      { name: 'newAmount', type: 'uint256' }
+    ],
+    outputs: []
+  },
+  {
+    name: 'addMember',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'groupId', type: 'uint256' },
+      { name: 'member', type: 'address' },
+      { name: 'memberName', type: 'string' }
+    ],
+    outputs: []
+  },
+  {
+    name: 'createExpense',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'groupId', type: 'uint256' },
+      { name: 'description', type: 'string' },
+      { name: 'amount', type: 'uint256' },
+      { name: 'participants', type: 'address[]' }
+    ],
+    outputs: [{ name: '', type: 'uint256' }]
+  },
+  {
+    name: 'settleExpense',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'expenseId', type: 'uint256' },
+      { name: 'amount', type: 'uint256' }
+    ],
+    outputs: []
+  },
+  {
+    name: 'settleAllDebts',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'groupId', type: 'uint256' }
+    ],
+    outputs: []
+  },
+  {
+    name: 'withdraw',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [],
+    outputs: []
+  },
   
   // View functions
-  'function getGroup(uint256 groupId) external view returns (uint256, string, address, address[], bool, uint256, string, uint256)',
-  'function getExpense(uint256 expenseId) external view returns (uint256, uint256, string, uint256, address, address[], bool, uint256)',
-  'function getUserGroups(address user) external view returns (uint256[])',
-  'function getUserBalance(address user, uint256 groupId) external view returns (int256)',
-  'function getGroupBalances(uint256 groupId) external view returns (address[], int256[])',
+  {
+    name: 'getGroup',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'groupId', type: 'uint256' }
+    ],
+    outputs: [
+      { name: '', type: 'uint256' },
+      { name: '', type: 'string' },
+      { name: '', type: 'address' },
+      { name: '', type: 'address[]' },
+      { name: '', type: 'bool' },
+      { name: '', type: 'uint256' },
+      { name: '', type: 'string' },
+      { name: '', type: 'uint256' }
+    ]
+  },
+  {
+    name: 'getExpense',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'expenseId', type: 'uint256' }
+    ],
+    outputs: [
+      { name: '', type: 'uint256' },
+      { name: '', type: 'uint256' },
+      { name: '', type: 'string' },
+      { name: '', type: 'uint256' },
+      { name: '', type: 'address' },
+      { name: '', type: 'address[]' },
+      { name: '', type: 'bool' },
+      { name: '', type: 'uint256' }
+    ]
+  },
+  {
+    name: 'getUserGroups',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'user', type: 'address' }
+    ],
+    outputs: [
+      { name: '', type: 'uint256[]' }
+    ]
+  },
+  {
+    name: 'getUserBalance',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'user', type: 'address' },
+      { name: 'groupId', type: 'uint256' }
+    ],
+    outputs: [
+      { name: '', type: 'int256' }
+    ]
+  },
+  {
+    name: 'getGroupBalances',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'groupId', type: 'uint256' }
+    ],
+    outputs: [
+      { name: '', type: 'address[]' },
+      { name: '', type: 'int256[]' }
+    ]
+  },
   
   // Events
-  'event GroupCreated(uint256 indexed groupId, string name, address creator)',
-  'event GroupCategoryUpdated(uint256 indexed groupId, string category)',
-  'event GroupAmountUpdated(uint256 indexed groupId, uint256 amount)',
-  'event ExpenseCreated(uint256 indexed expenseId, uint256 indexed groupId, string description, uint256 amount, address paidBy)',
-  'event ExpenseSettled(uint256 indexed expenseId, address settler, uint256 amount)',
+  {
+    name: 'GroupCreated',
+    type: 'event',
+    inputs: [
+      { name: 'groupId', type: 'uint256', indexed: true },
+      { name: 'name', type: 'string', indexed: false },
+      { name: 'creator', type: 'address', indexed: false }
+    ]
+  },
+  {
+    name: 'GroupCategoryUpdated',
+    type: 'event',
+    inputs: [
+      { name: 'groupId', type: 'uint256', indexed: true },
+      { name: 'category', type: 'string', indexed: false }
+    ]
+  },
+  {
+    name: 'GroupAmountUpdated',
+    type: 'event',
+    inputs: [
+      { name: 'groupId', type: 'uint256', indexed: true },
+      { name: 'amount', type: 'uint256', indexed: false }
+    ]
+  },
+  {
+    name: 'ExpenseCreated',
+    type: 'event',
+    inputs: [
+      { name: 'expenseId', type: 'uint256', indexed: true },
+      { name: 'groupId', type: 'uint256', indexed: true },
+      { name: 'description', type: 'string', indexed: false },
+      { name: 'amount', type: 'uint256', indexed: false },
+      { name: 'paidBy', type: 'address', indexed: false }
+    ]
+  },
+  {
+    name: 'ExpenseSettled',
+    type: 'event',
+    inputs: [
+      { name: 'expenseId', type: 'uint256', indexed: true },
+      { name: 'settler', type: 'address', indexed: false },
+      { name: 'amount', type: 'uint256', indexed: false }
+    ]
+  }
 ] as const;
 
 export const EXPENSE_TOKEN_ABI = [

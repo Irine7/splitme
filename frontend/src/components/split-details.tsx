@@ -38,11 +38,15 @@ interface SplitDetailsProps {
 
 export function SplitDetails({ groupId }: SplitDetailsProps) {
   const { address } = useAccount();
-  const { groups } = useGroupStore();
+  // Используем хук useGroupStore напрямую для получения актуальных данных
+  const groups = useGroupStore(state => state.groups);
   const [participants, setParticipants] = useState<ParticipantWithStatus[]>([]);
   
-  // Find the group in the Zustand store
+  // Находим группу в Zustand сторе
   const storeGroup = groups.find(g => g.id === groupId) as Group | undefined;
+  
+  // Логируем для отладки
+  console.log(`SplitDetails: Looking for group ${groupId} in store with ${groups.length} groups:`, groups);
   
   // Get group data from blockchain
   const { data: groupData, isLoading: isLoadingGroup } = useReadContract({
@@ -52,46 +56,23 @@ export function SplitDetails({ groupId }: SplitDetailsProps) {
     args: [BigInt(groupId)],
   }) as { data: any[] | undefined, isLoading: boolean };
 
-  // Combine data from store and blockchain
+  // Всегда используем данные из локального стора для участников и сумм
   useEffect(() => {
-    if (groupData && Array.isArray(groupData)) {
-      const [, name, creator, members] = groupData;
+    console.log('SplitDetails: storeGroup =', storeGroup);
+    console.log(`SplitDetails: Looking for group ${groupId} in store with ${groups.length} groups:`, groups.map(g => ({ id: g.id, name: g.name, members: g.members.length })));
+    
+    // Если есть данные в локальном сторе, используем их
+    if (storeGroup && storeGroup.members && storeGroup.members.length > 0) {
+      console.log(`SplitDetails: group ${groupId} has ${storeGroup.members.length} members:`, storeGroup.members);
       
-      // Create participants with settlement status based on host
-      const participantsWithStatus: ParticipantWithStatus[] = members.map((memberAddress: `0x${string}`) => {
-        // The host (creator) is always settled, others are pending
-        const isHost = memberAddress === creator;
-        const hasSettled = isHost;
-        const settledAt = hasSettled ? Math.floor(Date.now() / 1000) : undefined;
-        
-        // Get participant name from store if available
-        let participantName = '';
-        if (storeGroup?.participantNames && storeGroup.participantNames[memberAddress]) {
-          participantName = storeGroup.participantNames[memberAddress];
-        } else {
-          participantName = memberAddress === creator ? 'Host' : 
-                          memberAddress === address ? 'You' : 
-                          `Participant`;
-        }
-        
-        return {
-          address: memberAddress,
-          name: participantName,
-          hasSettled,
-          settledAt
-        };
-      });
-      
-      setParticipants(participantsWithStatus);
-    } else if (storeGroup && storeGroup.members.length > 0) {
-      // If we don't have blockchain data yet but have store data
+      // Создаем список участников с их статусом
       const participantsWithStatus: ParticipantWithStatus[] = storeGroup.members.map((memberAddress) => {
-        // The host (creator) is always settled, others are pending
+        // Хост (создатель) всегда считается рассчитавшимся, остальные - ожидают
         const isHost = memberAddress === storeGroup.creator;
         const hasSettled = isHost;
         const settledAt = hasSettled ? Math.floor(Date.now() / 1000) : undefined;
         
-        // Get participant name from store if available
+        // Получаем имя участника из стора, если доступно
         let participantName = '';
         if (storeGroup.participantNames && storeGroup.participantNames[memberAddress]) {
           participantName = storeGroup.participantNames[memberAddress];
@@ -110,8 +91,53 @@ export function SplitDetails({ groupId }: SplitDetailsProps) {
       });
       
       setParticipants(participantsWithStatus);
+    } 
+    // Если есть данные из блокчейна, но нет данных в сторе
+    else if (groupData && Array.isArray(groupData)) {
+      const [, name, creator, members] = groupData;
+      console.log(`SplitDetails: blockchain data for group ${groupId} has ${members.length} members:`, members);
+      
+      // Создаем участников с их статусом на основе данных из блокчейна
+      const participantsWithStatus: ParticipantWithStatus[] = members.map((memberAddress: `0x${string}`) => {
+        const isHost = memberAddress === creator;
+        const hasSettled = isHost;
+        const settledAt = hasSettled ? Math.floor(Date.now() / 1000) : undefined;
+        
+        // Простое имя для участника
+        const participantName = memberAddress === creator ? 'Host' : 
+                              memberAddress === address ? 'You' : 
+                              `Participant`;
+        
+        return {
+          address: memberAddress,
+          name: participantName,
+          hasSettled,
+          settledAt
+        };
+      });
+      
+      setParticipants(participantsWithStatus);
+      
+      // Если есть данные из блокчейна, но нет в сторе, создаем группу в сторе
+      if (!storeGroup) {
+        console.log(`SplitDetails: Creating missing group ${groupId} in store from blockchain data`);
+        const newGroup = {
+          id: groupId,
+          name: name || `Split #${groupId}`,
+          creator: creator,
+          members: members,
+          participantNames: {},
+          createdAt: Math.floor(Date.now() / 1000),
+          category: 'other',
+          amount: 0
+        };
+        
+        // Добавляем группу в стор
+        const currentGroups = useGroupStore.getState().groups;
+        useGroupStore.getState().setGroups([...currentGroups, newGroup]);
+      }
     }
-  }, [groupData, storeGroup, address]);
+  }, [groupData, storeGroup, address, groupId, groups]);
 
   // Get category info
   const categoryId = storeGroup?.category || 'other';
@@ -135,8 +161,15 @@ export function SplitDetails({ groupId }: SplitDetailsProps) {
   // Combine data from both sources
   const displayName = groupData && Array.isArray(groupData) ? groupData[1] : storeGroup?.name || `Split #${groupId}`;
   const creator = groupData && Array.isArray(groupData) ? groupData[2] : storeGroup?.creator || '0x0000000000000000000000000000000000000000';
-  const createdAt = storeGroup?.createdAt || Math.floor(Date.now() / 1000) - 86400; // Default to yesterday
+  const createdAt = storeGroup?.createdAt || Math.floor(Date.now() / 1000) - 86400;  // Get amount from store if available
   const amount = storeGroup?.amount || 0;
+  
+  // Логируем данные для отладки
+  console.log('SplitDetails: storeGroup =', storeGroup);
+  console.log(`SplitDetails: amount = ${amount}, participants = ${participants.length}`);
+  if (participants.length > 0) {
+    console.log(`SplitDetails: amount per person = ${amount > 0 ? (amount / participants.length).toFixed(2) : '0.00'}`);
+  }
   
   return (
     <div className="glass-card p-6 border-gray-200 dark:border-gray-800">

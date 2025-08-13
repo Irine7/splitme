@@ -503,8 +503,8 @@
       ]
     },
     "/Users/irine/Desktop/splitme/contracts/src/SplitMe.sol": {
-      "lastModificationDate": 1754676041671,
-      "contentHash": "b6e5ca7cab472e09bbe79cb6502f1f0e",
+      "lastModificationDate": 1755101605087,
+      "contentHash": "e89a8014ea4bfc7ef1bfa1da89b98297",
       "sourceName": "contracts/src/SplitMe.sol",
       "solcConfig": {
         "version": "0.8.20",

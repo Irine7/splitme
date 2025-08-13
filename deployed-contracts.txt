@@ -1,0 +1,41 @@
+# SplitMe Deployed Contracts
+
+## Network: Morph Holesky Testnet (Chain ID: 2810)
+Deployment Date: 2025-08-13
+
+## Contract Addresses
+
+### ExpenseToken
+Address: 0x9444126e1331845278197CEBEC6f2C6Ab1B9B469
+Description: ERC20 token used for expense tracking and settlement in the SplitMe application.
+Features:
+- Name: SplitMe Token
+- Symbol: SPLIT
+- Decimals: 18
+- Initial Supply: 1,000,000 tokens (minted to deployer)
+- Faucet functionality for testnet users
+
+### SplitMe
+Address: 0xDb8Fda1b6fb96530b3FbFD2bf1F8F0721Cea036C
+Description: Main contract for managing expense splits between users.
+Features:
+- Create and manage expense groups
+- Add expenses to groups
+- Track balances between users
+- Settle expenses using the ExpenseToken
+- Group categorization (food, transport, entertainment, etc.)
+
+## Deployment Information
+- Deployer Address: 0x357d8fA29bb2C6a65EC34AD744C887fBab6CCF01
+- Network: Morph Holesky Testnet
+- RPC URL: https://rpc-quicknode-holesky.morphl2.io
+
+## Frontend Integration
+The contract addresses are configured in:
+- File: frontend/src/constants/contracts.ts
+- ABI: Structured format for compatibility with wagmi
+
+## Notes
+- ExpenseToken uses the Ownable pattern with the deployer as the initial owner
+- SplitMe uses the ExpenseToken for settlements
+- Both contracts are verified on the Morph Holesky block explorer

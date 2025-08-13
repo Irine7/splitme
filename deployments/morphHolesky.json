@@ -1,0 +1,9 @@
+{
+  "network": "morphHolesky",
+  "expenseTokenAddress": "0x9444126e1331845278197CEBEC6f2C6Ab1B9B469",
+  "splitMeAddress": "0xDb8Fda1b6fb96530b3FbFD2bf1F8F0721Cea036C",
+  "deployer": "0x357d8fA29bb2C6a65EC34AD744C887fBab6CCF01",
+  "timestamp": "2025-08-13T18:39:59.310Z",
+  "expenseTokenTx": "0xe8ea2e21fdc7f29d191847b940545a0c918112791e15f10583394044dc39a49f",
+  "splitMeTx": "0x5cf443b50b3337713ab361daf57c650b3676ca1cd45deebb4b83821d37e3705e"
+}

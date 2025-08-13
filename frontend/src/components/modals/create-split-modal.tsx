@@ -6,6 +6,8 @@ import {
 	useWaitForTransactionReceipt,
 	useAccount,
 } from 'wagmi';
+import { ethers } from 'ethers';
+import { Log as ViemLog } from 'viem';
 import { CONTRACTS, SPLIT_ME_ABI } from '@/constants/contracts';
 import { Button } from '@/components/ui/button';
 import { X, Plus, Trash2, Users, CreditCard, Tag } from 'lucide-react';
@@ -131,6 +133,18 @@ export function CreateSplitModal({
 			resetWrite();
 		}
 	}, [writeError, resetWrite]);
+	
+	// Reset transaction state after successful transaction to prevent repeated RPC requests
+	useEffect(() => {
+		if (isSuccess && receipt) {
+			// Сбрасываем состояние транзакции после успешной обработки
+			const timer = setTimeout(() => {
+				resetWrite();
+			}, 1000); // Небольшая задержка для завершения всех операций
+			
+			return () => clearTimeout(timer);
+		}
+	}, [isSuccess, receipt, resetWrite]);
 
 	// Handle successful transaction
 	useEffect(() => {
@@ -138,30 +152,103 @@ export function CreateSplitModal({
 
 		const processReceipt = () => {
 			try {
+				// Логируем все события для отладки
+				console.log('Transaction receipt logs:', receipt.logs);
+				
+				// Проверяем все топики для поиска события GroupCreated
+				// Вычисляем сигнатуру события динамически из ABI
+				const groupCreatedAbi = SPLIT_ME_ABI.find(item => item.type === 'event' && item.name === 'GroupCreated');
+				const eventSignature = ethers.id(
+					`GroupCreated(${groupCreatedAbi?.inputs.map(input => input.type).join(',')})`
+				);
+				console.log('Looking for event with signature:', eventSignature);
+				
 				// Extract groupId from the transaction receipt logs
 				const groupCreatedEvent = receipt.logs.find(
-					(log: Log) =>
-						log.topics[0] ===
-						'0x3a0ca8f38b91a9c9d298b34a890bdb4ef784edb3f0a5fbb7efbafd2f01cee3a7' // GroupCreated event signature
+					(log: ViemLog) => log.topics[0] === eventSignature
 				);
+				
+				console.log('Found event:', groupCreatedEvent);
 
 				if (groupCreatedEvent) {
 					const groupId = parseInt(groupCreatedEvent.topics[1], 16);
+					console.log('Extracted groupId:', groupId);
 
 					// Ensure we have a valid group name
 					const groupNameToUse = groupName || 'Unnamed Group';
+					
+					// Добавляем всех участников в локальный стор
+					console.log('Adding all participants to local store:', participants);
 
 					// Update the group in the store with the correct ID from blockchain
 					// First remove any temporary groups with the same name
 					const { groups } = useGroupStore.getState();
 					const updatedGroups = groups.filter((g) => g.name !== groupNameToUse);
 
-					// Add the new group to the store with the correct ID and category
+					// Подготовим список всех участников, включая создателя и добавленных участников
+					// Удаляем дубликаты адресов с помощью Set
+					const uniqueAddresses = new Set<string>();
+					
+					// Добавляем адрес создателя
+					uniqueAddresses.add(address as string);
+					
+					// Добавляем адреса всех участников
+					participants.forEach(p => uniqueAddresses.add(p.address));
+					
+					// Преобразуем в массив
+					const allMembers = Array.from(uniqueAddresses) as `0x${string}`[];
+
+					// Подготовим имена всех участников
+					const participantNamesMap = {
+						[address as string]: 'Me (Current User)',
+						...participants.reduce(
+							(acc, p) => ({ ...acc, [p.address]: p.name }),
+							{}
+						)
+					};
+
+					// Создаем новую группу с правильными данными
+					const newGroup = {
+						id: groupId,
+						name: groupNameToUse,
+						creator: address as `0x${string}`,
+						members: allMembers,
+						participantNames: participantNamesMap,
+						createdAt: Math.floor(Date.now() / 1000),
+						category: category, // Include the selected category
+						amount: splitAmount > 0 ? splitAmount : undefined, // Include the split amount if provided
+					};
+
+					console.log('Saving new group to store with all participants:', newGroup);
+					console.log(`Group ${groupId} has ${allMembers.length} unique members:`, allMembers);
+
+					// Добавляем новую группу в стор через addGroup вместо setState
+					// Это гарантирует, что все слушатели будут уведомлены о изменениях
+					useGroupStore.getState().setGroups([
+						...updatedGroups,
+						newGroup
+					]);
+
+					toast.success('Split created successfully!');
+					setGroupName('');
+					// Закрываем модальное окно после успешного создания сплита
+					onClose();
+				} else {
+					// Если событие не найдено, но транзакция успешна, все равно обновляем UI
+					console.log('GroupCreated event not found in logs, but transaction was successful');
+					
+					// Используем временный ID, так как не можем получить реальный ID с блокчейна
+					const tempGroupId = Math.floor(Math.random() * 1000000);
+					console.log('Using temporary groupId:', tempGroupId);
+					
+					const groupNameToUse = groupName || 'Unnamed Group';
+					
+					// Обновляем состояние с временным ID
 					useGroupStore.setState({
 						groups: [
-							...updatedGroups,
+							...useGroupStore.getState().groups,
 							{
-								id: groupId,
+								id: tempGroupId,
 								name: groupNameToUse,
 								creator: address as `0x${string}`,
 								members: [
@@ -176,14 +263,16 @@ export function CreateSplitModal({
 									),
 								},
 								createdAt: Math.floor(Date.now() / 1000),
-								category: category, // Include the selected category
-								amount: splitAmount > 0 ? splitAmount : undefined, // Include the split amount if provided
+								category: category,
+								amount: splitAmount > 0 ? splitAmount : undefined,
 							},
 						],
 					});
-
+					
 					toast.success('Split created successfully!');
 					setGroupName('');
+					// Закрываем модальное окно после успешного создания сплита
+					onClose();
 				}
 			} catch (error) {
 				console.error('Error processing transaction receipt:', error);
@@ -194,7 +283,7 @@ export function CreateSplitModal({
 		};
 
 		processReceipt();
-	}, [isSuccess, receipt, groupName, address, category, participants, onClose]);
+	}, [isSuccess, receipt, groupName, address, category, participants]); // Убрали onClose из зависимостей
 
 	// Добавление участника в список
 	const addParticipant = () => {
@@ -320,19 +409,34 @@ export function CreateSplitModal({
 			const creatorName = creatorEntry?.ownerName || 'You';
 
 			// Explicitly type the contract call
-			const contractCall = {
-				address: CONTRACTS.SPLIT_ME as `0x${string}`,
-				abi: SPLIT_ME_ABI,
-				functionName: 'createGroup' as const,
-				args: [
+			try {
+				// Prepare arguments as a tuple to match the expected type
+				const args = [
 					groupName.trim(),
 					category || 'other',
 					BigInt(splitAmount || 0),
-					creatorName,
-				] as const, // Передаем категорию, сумму и имя создателя
-			};
+					creatorName
+				] as const; // Use 'as const' to make TypeScript treat this as a tuple
 
-			writeContract(contractCall);
+				console.log('Calling contract with args:', {
+					name: args[0],
+					category: args[1],
+					amount: args[2],
+					creatorName: args[3]
+				});
+				
+				// Use prepared args tuple
+				writeContract({
+					address: CONTRACTS.SPLIT_ME as `0x${string}`,
+					abi: SPLIT_ME_ABI,
+					functionName: 'createGroup',
+					args
+				});
+			} catch (error) {
+				console.error('Error preparing contract call:', error);
+				toast.error('Error preparing contract call');
+				setIsLoading(false);
+			}
 
 			// Also save to Zustand store directly to ensure it appears in the list immediately
 			// This will be updated with the correct ID once the transaction is confirmed
@@ -576,9 +680,9 @@ export function CreateSplitModal({
 									</SelectTrigger>
 									<SelectContent>
 										<SelectItem value="none">-- Select a contact --</SelectItem>
-										{useAddressBookStore.getState().entries.map((entry) => (
+										{useAddressBookStore.getState().entries.map((entry, idx) => (
 											<SelectItem
-												key={entry.address}
+												key={`address-book-entry-${idx}-${entry.address}`}
 												value={`${entry.ownerName}|${entry.address}`}
 											>
 												{entry.ownerName} ({entry.address.substring(0, 6)}...
