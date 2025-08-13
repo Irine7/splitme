@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Receipt, DollarSign, Clock } from 'lucide-react';
 import { SettleExpenseModal } from './modals/settle-expense-modal';
+import { SplitDetailsModal } from './modals/split-details-modal';
 import { useGroupStore, Group } from '@/stores/group-store';
 
 interface ExpenseListProps {
@@ -16,6 +17,7 @@ interface ExpenseListProps {
 export function ExpenseList({ groupId }: ExpenseListProps) {
   const { address } = useAccount();
   const [selectedExpenseId, setSelectedExpenseId] = useState<number | null>(null);
+  const [selectedSplitId, setSelectedSplitId] = useState<number | null>(null);
   const { groups } = useGroupStore();
   
   // Get user groups from blockchain
@@ -95,9 +97,19 @@ export function ExpenseList({ groupId }: ExpenseListProps) {
             expense={expense}
             currentUser={address}
             onSettle={(expenseId) => setSelectedExpenseId(expenseId)}
+            onViewDetails={(splitId) => setSelectedSplitId(splitId)}
           />
         ))}
       </div>
+      
+      {/* Модальное окно для просмотра деталей сплита */}
+      {selectedSplitId !== null && (
+        <SplitDetailsModal
+          isOpen={selectedSplitId !== null}
+          onClose={() => setSelectedSplitId(null)}
+          groupId={selectedSplitId}
+        />
+      )}
 
       {selectedExpenseId && (
         <SettleExpenseModal
@@ -110,16 +122,20 @@ export function ExpenseList({ groupId }: ExpenseListProps) {
   );
 }
 
-function ExpenseItem({ expense, currentUser, onSettle }: {
+function ExpenseItem({ expense, currentUser, onSettle, onViewDetails }: {
   expense: any;
   currentUser: string | undefined;
   onSettle: (expenseId: number) => void;
+  onViewDetails?: (splitId: number) => void;
 }) {
   const isPaidByUser = expense.paidBy === currentUser;
   const userShare = expense.amount / expense.participants;
 
   return (
-    <div className="p-4 hover:bg-secondary/10 dark:hover:bg-white/5 transition-colors border-border/50 dark:border-white/10">
+    <div 
+      className="p-4 hover:bg-secondary/10 dark:hover:bg-white/5 transition-colors border-border/50 dark:border-white/10 cursor-pointer"
+      onClick={() => onViewDetails && onViewDetails(expense.id)}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
