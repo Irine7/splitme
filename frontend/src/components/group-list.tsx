@@ -177,6 +177,7 @@ function GroupItem({
 	});
 
 	// Используем только данные из локального стора для всех полей
+	// Если имя группы в сторе - "Unnamed Group", то попробуем получить его из блокчейна
 	let displayName = group.name;
 	
 	// Всегда используем только данные из локального стора для количества участников
@@ -185,10 +186,21 @@ function GroupItem({
 	
 	console.log(`GroupItem: group ${group.id} has ${membersCount} members:`, group.members);
 
-	// Используем данные из блокчейна только для имени группы, если оно отсутствует в сторе
-	if (groupData && !group.name) {
+	// Используем данные из блокчейна для имени группы, если оно отсутствует в сторе или равно "Unnamed Group"
+	if (groupData && (displayName === 'Unnamed Group' || !displayName)) {
 		const [, name, , ] = groupData;
-		displayName = name;
+		if (name && name !== '') {
+			displayName = name;
+			// Обновляем имя в сторе
+			const currentGroups = useGroupStore.getState().groups;
+			const updatedGroups = currentGroups.map(g => {
+				if (g.id === group.id) {
+					return { ...g, name };
+				}
+				return g;
+			});
+			useGroupStore.getState().setGroups(updatedGroups);
+		}
 	}
 
 	const handleDelete = (e: React.MouseEvent) => {
