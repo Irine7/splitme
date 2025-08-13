@@ -20,6 +20,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         bool isActive;
         uint256 createdAt;
         string category; // Категория группы (food, transport, entertainment, etc.)
+        uint256 totalAmount; // Общая сумма сплита
     }
 
     struct Expense {
@@ -56,6 +57,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
     mapping(address => uint256[]) public userGroups;
     mapping(address => mapping(uint256 => int256)) public userBalances; // groupId => balance
     mapping(address => uint256) public withdrawableBalances;
+    mapping(uint256 => mapping(address => bool)) public groupMembership; // groupId => member => isMember
 
     // Events
     event GroupCreated(uint256 indexed groupId, string name, address creator);
@@ -65,6 +67,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
     event SettlementProcessed(uint256 indexed settlementId, address from, address to, uint256 amount);
     event BalanceUpdated(uint256 indexed groupId, address user, int256 newBalance);
     event GroupCategoryUpdated(uint256 indexed groupId, string category);
+    event GroupAmountUpdated(uint256 indexed groupId, uint256 amount);
 
     modifier onlyGroupMember(uint256 groupId) {
         require(_isGroupMember(groupId, msg.sender), "Not a group member");
@@ -81,7 +84,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         usdcToken = IERC20(_usdcToken);
     }
 
-    function createGroup(string calldata name, string calldata category) external whenNotPaused returns (uint256) {
+    function createGroup(string calldata name, string calldata category, uint256 amount) external whenNotPaused returns (uint256) {
         require(bytes(name).length > 0, "Group name cannot be empty");
         
         groupCounter++;
@@ -94,8 +97,10 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         newGroup.isActive = true;
         newGroup.createdAt = block.timestamp;
         newGroup.category = category; // Сохраняем категорию группы
+        newGroup.totalAmount = amount; // Сохраняем общую сумму сплита
         
         userGroups[msg.sender].push(groupCounter);
+        groupMembership[groupCounter][msg.sender] = true; // Добавляем запись о членстве в маппинг
         
         emit GroupCreated(groupCounter, name, msg.sender);
         return groupCounter;
@@ -111,6 +116,16 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         emit GroupCategoryUpdated(groupId, newCategory);
     }
 
+    function updateGroupAmount(uint256 groupId, uint256 newAmount) 
+        external 
+        validGroup(groupId) 
+        whenNotPaused 
+    {
+        require(msg.sender == groups[groupId].creator, "Only group creator can update amount");
+        groups[groupId].totalAmount = newAmount;
+        emit GroupAmountUpdated(groupId, newAmount);
+    }
+
     function addMember(uint256 groupId, address member) 
         external 
         validGroup(groupId) 
@@ -122,6 +137,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
 
         groups[groupId].members.push(member);
         userGroups[member].push(groupId);
+        groupMembership[groupId][member] = true; // Добавляем запись о членстве в маппинг
         
         emit MemberAdded(groupId, member);
     }
@@ -275,7 +291,8 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         address[] memory members,
         bool isActive,
         uint256 createdAt,
-        string memory category
+        string memory category,
+        uint256 totalAmount
     ) {
         Group storage group = groups[groupId];
         return (
@@ -285,7 +302,8 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
             group.members,
             group.isActive,
             group.createdAt,
-            group.category
+            group.category,
+            group.totalAmount
         );
     }
 
@@ -336,13 +354,8 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
 
     // Internal functions
     function _isGroupMember(uint256 groupId, address user) internal view returns (bool) {
-        Group storage group = groups[groupId];
-        for (uint256 i = 0; i < group.members.length; i++) {
-            if (group.members[i] == user) {
-                return true;
-            }
-        }
-        return false;
+        // Используем маппинг для быстрой проверки членства вместо перебора массива
+        return groupMembership[groupId][user];
     }
 
     function _distributeToCreditors(uint256 groupId, uint256 totalAmount) internal {
