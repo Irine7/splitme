@@ -148,9 +148,10 @@ function AddressBook() {
 
 					<Button
 						onClick={handleAddEntry}
-						className="mt-4 bg-purple-600 hover:bg-purple-700 text-white"
+						variant="purple"
+						className="mt-4 border border-gray-200 dark:border-gray-800 "
 					>
-						<Plus className="w-4 h-4 mr-2" />
+						<Plus className="w-4 h-4 mr-2" /> 
 						Add Address
 					</Button>
 				</div>
