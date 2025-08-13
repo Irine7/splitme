@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { X, Plus, Trash2, Users, CreditCard, Tag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useGroupStore } from '@/stores/group-store';
-import { useAddressBookStore } from '@/stores/address-book-store';
+import { useAddressBookStore, AddressEntry } from '@/stores/address-book-store';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -310,12 +310,17 @@ export function CreateGroupModal({
 				]);
 			}
 
+			// Получаем имя пользователя из адресной книги или используем дефолтное
+			const addressBook = useAddressBookStore.getState().entries;
+			const creatorEntry = addressBook.find((entry: AddressEntry) => entry.address.toLowerCase() === address?.toLowerCase());
+			const creatorName = creatorEntry?.ownerName || 'You';
+
 			// Explicitly type the contract call
 			const contractCall = {
 				address: CONTRACTS.SPLIT_ME as `0x${string}`,
 				abi: SPLIT_ME_ABI,
 				functionName: 'createGroup' as const,
-				args: [groupName.trim(), category || 'other', BigInt(splitAmount || 0)] as const, // Передаем категорию и сумму сплита
+				args: [groupName.trim(), category || 'other', BigInt(splitAmount || 0), creatorName] as const, // Передаем категорию, сумму и имя создателя
 			};
 
 			writeContract(contractCall);

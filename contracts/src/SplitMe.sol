@@ -21,6 +21,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         uint256 createdAt;
         string category; // Категория группы (food, transport, entertainment, etc.)
         uint256 totalAmount; // Общая сумма сплита
+        mapping(address => string) memberNames; // Имена участников
     }
 
     struct Expense {
@@ -84,7 +85,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         usdcToken = IERC20(_usdcToken);
     }
 
-    function createGroup(string calldata name, string calldata category, uint256 amount) external whenNotPaused returns (uint256) {
+    function createGroup(string calldata name, string calldata category, uint256 amount, string calldata creatorName) external whenNotPaused returns (uint256) {
         require(bytes(name).length > 0, "Group name cannot be empty");
         
         groupCounter++;
@@ -98,6 +99,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         newGroup.createdAt = block.timestamp;
         newGroup.category = category; // Сохраняем категорию группы
         newGroup.totalAmount = amount; // Сохраняем общую сумму сплита
+        newGroup.memberNames[msg.sender] = creatorName; // Сохраняем имя создателя
         
         userGroups[msg.sender].push(groupCounter);
         groupMembership[groupCounter][msg.sender] = true; // Добавляем запись о членстве в маппинг
@@ -126,7 +128,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         emit GroupAmountUpdated(groupId, newAmount);
     }
 
-    function addMember(uint256 groupId, address member) 
+    function addMember(uint256 groupId, address member, string calldata memberName) 
         external 
         validGroup(groupId) 
         whenNotPaused 
@@ -138,6 +140,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         groups[groupId].members.push(member);
         userGroups[member].push(groupId);
         groupMembership[groupId][member] = true; // Добавляем запись о членстве в маппинг
+        groups[groupId].memberNames[member] = memberName; // Сохраняем имя нового участника
         
         emit MemberAdded(groupId, member);
     }
@@ -305,6 +308,11 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
             group.category,
             group.totalAmount
         );
+    }
+    
+    function getMemberName(uint256 groupId, address member) external view returns (string memory) {
+        require(_isGroupMember(groupId, member), "Not a group member");
+        return groups[groupId].memberNames[member];
     }
 
     function getExpense(uint256 expenseId) external view returns (

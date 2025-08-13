@@ -5,10 +5,10 @@ export const CONTRACTS = {
 
 export const SPLIT_ME_ABI = [
   // Core functions
-  'function createGroup(string calldata name, string calldata category, uint256 amount) external returns (uint256)',
+  'function createGroup(string calldata name, string calldata category, uint256 amount, string calldata creatorName) external returns (uint256)',
   'function updateGroupCategory(uint256 groupId, string calldata newCategory) external',
   'function updateGroupAmount(uint256 groupId, uint256 newAmount) external',
-  'function addMember(uint256 groupId, address member) external',
+  'function addMember(uint256 groupId, address member, string calldata memberName) external',
   'function createExpense(uint256 groupId, string calldata description, uint256 amount, address[] calldata participants) external returns (uint256)',
   'function settleExpense(uint256 expenseId, uint256 amount) external',
   'function settleAllDebts(uint256 groupId) external',
