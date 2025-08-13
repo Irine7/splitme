@@ -91,101 +91,101 @@ SplitMe is a decentralized blockchain-based web application for conveniently sha
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Использование приложения
+## Using the Application
 
-### Подключение кошелька
+### Connecting Your Wallet
 
-1. Нажмите кнопку "Подключить кошелёк" в верхнем правом углу
-2. Выберите ваш кошелек (MetaMask, WalletConnect и т.д.)
-3. Подтвердите подключение в вашем кошельке
+1. Click the "Connect Wallet" button in the upper right corner
+2. Select your wallet (MetaMask, WalletConnect, etc.)
+3. Confirm the connection in your wallet
 
-### Создание нового сплита
+### Creating a New Split
 
-1. На главной странице нажмите кнопку "Создать сплит"
-2. Введите название сплита
-3. Выберите категорию расхода
-4. Добавьте участников, указав их Ethereum-адреса
-5. Введите общую сумму расхода
-6. Нажмите "Создать сплит" для создания группы
+1. On the main page, click the "Create Split" button
+2. Enter the split name
+3. Select an expense category
+4. Add participants by entering their Ethereum addresses
+5. Enter the total expense amount
+6. Click "Create Split" to create the group
 
-### Просмотр сплитов
+### Viewing Splits
 
-1. Перейдите на вкладку "Мои сплиты" для просмотра ваших групп
-2. Нажмите на любой сплит для просмотра подробной информации
-3. В деталях сплита вы увидите всех участников и суммы их долгов
+1. Go to the "My Splits" tab to view your groups
+2. Click on any split to view detailed information
+3. In the split details, you will see all participants and their debt amounts
 
-### История расходов
+### Expense History
 
-1. Перейдите на вкладку "История" для просмотра истории всех расходов
-2. Нажмите на любой расход для просмотра подробной информации
-3. Используйте фильтры для поиска конкретных расходов
+1. Go to the "History" tab to view the history of all expenses
+2. Click on any expense to view detailed information
+3. Use filters to search for specific expenses
 
-## Структура проекта
+## Project Structure
 
 ```
 splitme/
-├── contracts/              # Смарт-контракты
-│   ├── SplitMe.sol         # Основной контракт приложения
-│   ├── ExpenseToken.sol    # Токен для расчетов
-│   └── scripts/            # Скрипты для деплоя
-├── frontend/               # Фронтенд приложения
+├── contracts/              # Smart contracts
+│   ├── SplitMe.sol         # Main application contract
+│   ├── ExpenseToken.sol    # Token for settlements
+│   └── scripts/            # Deployment scripts
+├── frontend/               # Frontend application
 │   ├── src/
-│   │   ├── app/            # Страницы приложения (Next.js)
-│   │   ├── components/     # React-компоненты
-│   │   ├── constants/      # Константы (адреса контрактов и т.д.)
-│   │   ├── hooks/          # Пользовательские хуки
-│   │   ├── stores/         # Хранилища состояния (Zustand)
-│   │   └── utils/          # Вспомогательные функции
-│   └── public/             # Статические файлы
-└── hardhat.config.js       # Конфигурация Hardhat
+│   │   ├── app/            # Application pages (Next.js)
+│   │   ├── components/     # React components
+│   │   ├── constants/      # Constants (contract addresses, etc.)
+│   │   ├── hooks/          # Custom hooks
+│   │   ├── stores/         # State stores (Zustand)
+│   │   └── utils/          # Helper functions
+│   └── public/             # Static files
+└── hardhat.config.js       # Hardhat configuration
 ```
 
-## Развернутые контракты
+## Deployed Contracts
 
-Текущие адреса контрактов в сети Morph Holesky Testnet:
+Current contract addresses in the Morph Holesky Testnet network:
 
 - ExpenseToken: `0x9444126e1331845278197CEBEC6f2C6Ab1B9B469`
 - SplitMe: `0xDb8Fda1b6fb96530b3FbFD2bf1F8F0721Cea036C`
 
-## Разработка
+## Development
 
-### Добавление новых функций
+### Adding New Features
 
-1. Создайте новую ветку для вашей функции:
+1. Create a new branch for your feature:
    ```bash
-   git checkout -b feature/ваша-новая-функция
+   git checkout -b feature/your-new-feature
    ```
 
-2. Внесите изменения в код
+2. Make changes to the code
 
-3. Протестируйте изменения:
+3. Test your changes:
    ```bash
-   # Для смарт-контрактов
+   # For smart contracts
    npx hardhat test
    
-   # Для фронтенда
+   # For frontend
    cd frontend && pnpm dev
    ```
 
-4. Создайте pull request в основную ветку
+4. Create a pull request to the main branch
 
-### Тестирование
+### Testing
 
-Для тестирования смарт-контрактов:
+For testing smart contracts:
 ```bash
 npx hardhat test
 ```
 
-## Лицензия
+## License
 
 MIT
 
-## Авторы
+## Authors
 
-- Ваше имя - [GitHub](https://github.com/yourusername)
+- Your Name - [GitHub](https://github.com/yourusername)
 
-## Благодарности
+## Acknowledgements
 
-- [Morph Network](https://www.morphl2.io/) - за предоставление тестовой сети
-- [shadcn/ui](https://ui.shadcn.com/) - за компоненты пользовательского интерфейса
-- [Wagmi](https://wagmi.sh/) - за инструменты взаимодействия с блокчейном
+- [Morph Network](https://www.morphl2.io/) - for providing the test network
+- [shadcn/ui](https://ui.shadcn.com/) - for user interface components
+- [Wagmi](https://wagmi.sh/) - for blockchain interaction tools
