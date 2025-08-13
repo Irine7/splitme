@@ -315,7 +315,7 @@ export function CreateGroupModal({
 				address: CONTRACTS.SPLIT_ME as `0x${string}`,
 				abi: SPLIT_ME_ABI,
 				functionName: 'createGroup' as const,
-				args: [groupName.trim()] as const,
+				args: [groupName.trim(), category || 'other'] as const, // Передаем категорию, по умолчанию 'other'
 			};
 
 			writeContract(contractCall);

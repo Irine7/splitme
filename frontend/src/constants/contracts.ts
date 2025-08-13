@@ -5,7 +5,8 @@ export const CONTRACTS = {
 
 export const SPLIT_ME_ABI = [
   // Core functions
-  'function createGroup(string calldata name) external returns (uint256)',
+  'function createGroup(string calldata name, string calldata category) external returns (uint256)',
+  'function updateGroupCategory(uint256 groupId, string calldata newCategory) external',
   'function addMember(uint256 groupId, address member) external',
   'function createExpense(uint256 groupId, string calldata description, uint256 amount, address[] calldata participants) external returns (uint256)',
   'function settleExpense(uint256 expenseId, uint256 amount) external',
@@ -13,7 +14,7 @@ export const SPLIT_ME_ABI = [
   'function withdraw() external',
   
   // View functions
-  'function getGroup(uint256 groupId) external view returns (uint256, string, address, address[], bool, uint256)',
+  'function getGroup(uint256 groupId) external view returns (uint256, string, address, address[], bool, uint256, string)',
   'function getExpense(uint256 expenseId) external view returns (uint256, uint256, string, uint256, address, address[], bool, uint256)',
   'function getUserGroups(address user) external view returns (uint256[])',
   'function getUserBalance(address user, uint256 groupId) external view returns (int256)',
@@ -21,6 +22,7 @@ export const SPLIT_ME_ABI = [
   
   // Events
   'event GroupCreated(uint256 indexed groupId, string name, address creator)',
+  'event GroupCategoryUpdated(uint256 indexed groupId, string category)',
   'event ExpenseCreated(uint256 indexed expenseId, uint256 indexed groupId, string description, uint256 amount, address paidBy)',
   'event ExpenseSettled(uint256 indexed expenseId, address settler, uint256 amount)',
 ] as const;

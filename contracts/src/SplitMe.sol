@@ -19,6 +19,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         address[] members;
         bool isActive;
         uint256 createdAt;
+        string category; // Категория группы (food, transport, entertainment, etc.)
     }
 
     struct Expense {
@@ -63,6 +64,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
     event ExpenseSettled(uint256 indexed expenseId, address settler, uint256 amount);
     event SettlementProcessed(uint256 indexed settlementId, address from, address to, uint256 amount);
     event BalanceUpdated(uint256 indexed groupId, address user, int256 newBalance);
+    event GroupCategoryUpdated(uint256 indexed groupId, string category);
 
     modifier onlyGroupMember(uint256 groupId) {
         require(_isGroupMember(groupId, msg.sender), "Not a group member");
@@ -79,7 +81,7 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         usdcToken = IERC20(_usdcToken);
     }
 
-    function createGroup(string calldata name) external whenNotPaused returns (uint256) {
+    function createGroup(string calldata name, string calldata category) external whenNotPaused returns (uint256) {
         require(bytes(name).length > 0, "Group name cannot be empty");
         
         groupCounter++;
@@ -91,11 +93,22 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         newGroup.members.push(msg.sender);
         newGroup.isActive = true;
         newGroup.createdAt = block.timestamp;
+        newGroup.category = category; // Сохраняем категорию группы
         
         userGroups[msg.sender].push(groupCounter);
         
         emit GroupCreated(groupCounter, name, msg.sender);
         return groupCounter;
+    }
+
+    function updateGroupCategory(uint256 groupId, string calldata newCategory) 
+        external 
+        validGroup(groupId) 
+        whenNotPaused 
+    {
+        require(msg.sender == groups[groupId].creator, "Only group creator can update category");
+        groups[groupId].category = newCategory;
+        emit GroupCategoryUpdated(groupId, newCategory);
     }
 
     function addMember(uint256 groupId, address member) 
@@ -261,7 +274,8 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
         address creator,
         address[] memory members,
         bool isActive,
-        uint256 createdAt
+        uint256 createdAt,
+        string memory category
     ) {
         Group storage group = groups[groupId];
         return (
@@ -270,7 +284,8 @@ contract SplitMe is ReentrancyGuard, Pausable, Ownable {
             group.creator,
             group.members,
             group.isActive,
-            group.createdAt
+            group.createdAt,
+            group.category
         );
     }
 
