@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useReadContract, useAccount } from 'wagmi';
 import { CONTRACTS, SPLIT_ME_ABI, EXPENSE_TOKEN_ABI } from '@/constants/contracts';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, parseAmount } from '@/utils/format';
@@ -17,6 +17,7 @@ interface SettleAllModalProps {
 
 export function SettleAllModal({ isOpen, onClose, groupId, debtAmount }: SettleAllModalProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { address: userAddress } = useAccount();
 
   const { writeContract: approveTokens, data: approveHash } = useWriteContract();
   const { writeContract: settleDebts, data: settleHash } = useWriteContract();
@@ -33,7 +34,7 @@ export function SettleAllModal({ isOpen, onClose, groupId, debtAmount }: SettleA
     address: CONTRACTS.EXPENSE_TOKEN,
     abi: EXPENSE_TOKEN_ABI,
     functionName: 'allowance',
-    args: [CONTRACTS.SPLIT_ME, CONTRACTS.SPLIT_ME], // This needs to be [userAddress, spenderAddress]
+    args: userAddress ? [userAddress, CONTRACTS.SPLIT_ME] : undefined, // [owner, spender]
   });
 
   const handleSettleAll = async () => {
@@ -43,7 +44,8 @@ export function SettleAllModal({ isOpen, onClose, groupId, debtAmount }: SettleA
       const amountBigInt = parseAmount(debtAmount.toString());
       
       // Check if we need to approve first
-      if (!allowance || allowance < amountBigInt) {
+      const allowanceBigInt = allowance ? BigInt(allowance.toString()) : BigInt(0);
+      if (!allowance || allowanceBigInt < amountBigInt) {
         toast.loading('Approving tokens...');
         
         await approveTokens({

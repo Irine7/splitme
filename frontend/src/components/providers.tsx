@@ -66,11 +66,7 @@ export function Providers({ children }: ProvidersProps) {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider modalSize="compact">
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem={false}
-          >
+          <ThemeProvider defaultTheme="light">
             {children}
           </ThemeProvider>
         </RainbowKitProvider>

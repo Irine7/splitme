@@ -16,7 +16,7 @@ export default function History() {
 					History
 				</h2>
 				{address ? (
-					<ExpenseList groupId={selectedGroupId} />
+					<ExpenseList groupId={selectedGroupId || 0} />
 				) : (
 					<p className="text-muted-foreground dark:text-white/60 text-center">
 						Please connect your wallet to view your history

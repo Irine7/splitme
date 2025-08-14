@@ -18,7 +18,7 @@ export function AddExpenseModal({ isOpen, onClose, groupId }: AddExpenseModalPro
   const { address } = useAccount();
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
-  const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
+  const [selectedParticipants, setSelectedParticipants] = useState<`0x${string}`[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const { writeContract, data: hash } = useWriteContract();
@@ -89,7 +89,7 @@ export function AddExpenseModal({ isOpen, onClose, groupId }: AddExpenseModalPro
     }
   };
 
-  const toggleParticipant = (memberAddress: string) => {
+  const toggleParticipant = (memberAddress: `0x${string}`) => {
     setSelectedParticipants(prev => 
       prev.includes(memberAddress)
         ? prev.filter(addr => addr !== memberAddress)
@@ -171,7 +171,7 @@ export function AddExpenseModal({ isOpen, onClose, groupId }: AddExpenseModalPro
                 Split with ({selectedParticipants.length} selected)
               </label>
               <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3">
-                {members.map((member: string) => (
+                {members.map((member: `0x${string}`) => (
                   <label
                     key={member}
                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer"

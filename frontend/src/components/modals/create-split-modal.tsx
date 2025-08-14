@@ -171,7 +171,7 @@ export function CreateSplitModal({
 				
 				console.log('Found event:', groupCreatedEvent);
 
-				if (groupCreatedEvent) {
+				if (groupCreatedEvent && groupCreatedEvent.topics[1]) {
 					const groupId = parseInt(groupCreatedEvent.topics[1], 16);
 					console.log('Extracted groupId:', groupId);
 
